@@ -82,7 +82,7 @@ export class Space extends Phaser.Scene
         this.physics.accelerateToObject(this.player, this.singlePlanet, 400);
         if (this.cursors.up.isDown)
         {
-            this.physics.accelerateToObject(this.player, this.planets[0], 400);
+            this.physics.accelerateToObject(this.player, this.singlePlanet, 400);
             if (!this.player.oxygenTank.isEmpty())
             {
                 this.player.oxygenTank.consumeOxygen(this.player.oxygenBurstConsumptionBySecond * delta_seconds);
@@ -91,13 +91,13 @@ export class Space extends Phaser.Scene
             else
             {
                 this.player.setAcceleration(0);
-                this.physics.accelerateToObject(this.player, this.planets[0], 400);
+                this.physics.accelerateToObject(this.player, this.singlePlanet, 400);
             }
         }
         else
         {
             this.player.setAcceleration(0);
-            this.physics.accelerateToObject(this.player, this.planets[0], 400);
+            this.physics.accelerateToObject(this.player, this.singlePlanet, 400);
         }
         
         //PLAYER PHYSICS

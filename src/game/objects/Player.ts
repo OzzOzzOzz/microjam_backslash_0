@@ -19,8 +19,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setMaxVelocity(200);
         
         this.oxygenTank = new OxygenTank(this.scene, this.x, this.y, 100);
-        this.oxygenBreathConsumptionBySecond = 1.0;
-        this.oxygenBurstConsumptionBySecond = 10.0;
+        // this.oxygenBreathConsumptionBySecond = 1.0;
+        this.oxygenBreathConsumptionBySecond = 0;
+        // this.oxygenBurstConsumptionBySecond = 10.0;
+        this.oxygenBurstConsumptionBySecond = 0;
         
         this.inventoryHUD = new InventoryHUD(scene, 30, 55, 3, 40, 10);
         this.inventoryHUD.setScrollFactor(0);
