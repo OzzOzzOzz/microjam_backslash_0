@@ -23,7 +23,11 @@ export class Space extends Phaser.Scene
     {
         const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(posX, posY);
         
-        let planet = this.planets.create(spawnCoordinates.x, spawnCoordinates.y, 'planet');
+        let planet = this.planets.create(
+            spawnCoordinates.x,
+            spawnCoordinates.y,
+            'planet' + Phaser.Math.Between(1, 4)
+        );
         planet.setCircle(radius / 2);
         planet.displayWidth = radius;
         planet.displayHeight = radius;
