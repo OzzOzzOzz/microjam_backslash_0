@@ -72,9 +72,7 @@ const addSprite = () => {
 
 // Event emitted from the PhaserGame component
 const currentScene = (scene: MainMenu) => {
-
     canMoveSprite.value = (scene.scene.key !== "MainMenu");
-
 }
 
 </script>
@@ -82,13 +80,16 @@ const currentScene = (scene: MainMenu) => {
 <template>
     <PhaserGame ref="phaserRef" @current-active-scene="currentScene" />
     <div>
+        <div class="subText">
+            <p>Scene: {{phaserRef?.scene?.scene?.key}}</p>
+        </div>
         <div>
             <button class="button" @click="changeScene">Change Scene</button>
         </div>
         <div>
             <button :disabled="canMoveSprite" class="button" @click="moveSprite">Toggle Movement</button>
         </div>
-        <div class="spritePosition">Sprite Position:
+        <div class="subText">Sprite Position:
             <pre>{{ spritePosition }}</pre>
         </div>
         <div>
