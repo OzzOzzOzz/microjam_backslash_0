@@ -101,7 +101,7 @@ export class Space extends Phaser.Scene
 
     changeScene ()
     {
-        this.scene.start('menu');
+        this.scene.start('Space');
         //console.log(this.sys.game.scene.scenes)
     }
 }
