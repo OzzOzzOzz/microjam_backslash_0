@@ -1,6 +1,5 @@
 import { EventBus } from '../EventBus';
 import Player from "../objects/Player";
-import Planet from "../objects/Planet.ts";
 import Vector2 = Phaser.Math.Vector2;
 import Background from "../objects/Background.ts";
 import {GameObjects} from "phaser";
@@ -14,30 +13,42 @@ export class Space extends Phaser.Scene
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private playerPositionText: Phaser.GameObjects.Text;
     attractedTo: AttractedTo | null = null;
-    singlePlanet: Planet;
+    planets: Phaser.Physics.Arcade.StaticGroup;
     
     constructor() {
         super('Space');
     }
 
-    spawnPlanet()
+    spawnPlanet(posX: number, posY: number, radius: number)
     {
-        const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(1000, 1000);
-
-        this.singlePlanet = new Planet(
-            this, 
-            spawnCoordinates.x, 
-            spawnCoordinates.y,
-            'planet',
-            200);
+        const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(posX, posY);
         
-        this.physics.add.overlap(this.player, this.singlePlanet.attractionSprite);
-        this.physics.world.on('overlap', (player: Player, attractionSprite: GameObjects.Sprite) => {
-            this.attractedTo = { attractionSprite: attractionSprite, distance: Phaser.Math.Distance.Between(player.x, player.y, attractionSprite.x, attractionSprite.y) };
-        })
-        this.physics.add.collider(this.singlePlanet, this.player, this.collisionCallback)
+        let planet = this.planets.create(spawnCoordinates.x, spawnCoordinates.y, 'planet');
+        planet.setCircle(radius / 2);
+        planet.displayWidth = radius;
+        planet.displayHeight = radius;
+        planet.body.setOffset(radius * 2, radius * 2);
+
+        let attractionSprite = this.physics.add.sprite(
+            spawnCoordinates.x,
+            spawnCoordinates.y, 
+            'planet-attraction-aura'
+        ).setAlpha(0.4);
+        attractionSprite.setCircle(attractionSprite.texture.source[0].width / 2);
+        attractionSprite.displayWidth = radius * 4;
+        attractionSprite.displayHeight = radius * 4;
+
+        this.physics.add.overlap(this.player, attractionSprite, this.overlapCallback, undefined, this);
+        this.physics.add.collider(this.planets, this.player, this.collisionCallback);
     }
-    
+
+    overlapCallback(player, planet) {
+        this.attractedTo = {
+            attractionSprite: planet,
+            distance: Phaser.Math.Distance.Between(player.x, player.y, planet.x, planet.y)
+        };
+    }
+
     create()
     {
         // Init Background
@@ -53,7 +64,8 @@ export class Space extends Phaser.Scene
         this.playerPositionText.setScrollFactor(0);
 
         // Init planets
-        this.spawnPlanet();
+        this.planets = this.physics.add.staticGroup();
+        this.spawnPlanet(1000, 1000, 200);
         
         EventBus.emit('current-scene-ready', this);
     }
