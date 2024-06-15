@@ -1,9 +1,10 @@
-import { GameObjects, Scene } from 'phaser';
+import { GameObjects } from 'phaser';
 import { EventBus } from '../EventBus';
+import Player from "../objects/Player";
 
-export class Space extends Scene
+export class Space extends Phaser.Scene
 {
-    private player: Phaser.GameObjects.Graphics;
+    private player: Player;
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     spaceBackgroundStars: {
         "behind": GameObjects.Image,
@@ -12,11 +13,16 @@ export class Space extends Scene
     };
     camera: Phaser.Cameras.Scene2D.Camera;
 
+    preload()
+    {
+        this.load.image('ship', 'https://labs.phaser.io/assets/games/asteroids/ship.png');
+    }
+    
     constructor() {
         super('Space');
     }
 
-    create ()
+    create()
     {
         // Init camera
         this.camera = this.cameras.main;
@@ -43,34 +49,16 @@ export class Space extends Scene
         };
 
         // Init player
-        this.player = this.add.graphics();
-        this.player.fillStyle(0xff0000, 1);
-        this.player.fillRect(0, 0, 50, 50);
-        this.player.setPosition(100, 100);
         this.cursors = this.input.keyboard!.createCursorKeys();
-        
+        this.player = new Player(this, 400, 300, 'ship', this.cursors);
+        this.cameras.main.startFollow(this.player);
+
         EventBus.emit('current-scene-ready', this);
     }
     
     update(time: number, delta: number)
     {
-        if (this.cursors.up.isDown)
-        {
-            this.player.y -= 10;
-        }
-        else if (this.cursors.down.isDown)
-        {
-            this.player.y += 10;
-        }
-        else if (this.cursors.left.isDown)
-        {
-            this.player.x -= 10;
-        }
-        else if (this.cursors.right.isDown)
-        {
-            this.player.x += 10;
-        }
-
+        this.player.update(time, delta);
     }
 
     changeScene ()
