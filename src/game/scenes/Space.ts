@@ -1,6 +1,8 @@
 import { GameObjects } from 'phaser';
 import { EventBus } from '../EventBus';
 import Player from "../objects/Player";
+import Planet from "../objects/Planet.ts";
+import Vector2 = Phaser.Math.Vector2;
 
 export class Space extends Phaser.Scene
 {
@@ -13,6 +15,10 @@ export class Space extends Phaser.Scene
     };
     private playerPositionText: Phaser.GameObjects.Text;
     
+    spaceBackground: GameObjects.Image;
+    planets: Planet[] = [];
+
+
     preload()
     {
         this.load.image('ship', 'https://labs.phaser.io/assets/games/asteroids/ship.png');
@@ -22,6 +28,18 @@ export class Space extends Phaser.Scene
         super('Space');
     }
 
+    spawnPlanet()
+    {
+        const spawnCoord: Vector2 = new Phaser.Math.Vector2(200, 100);
+
+        this.planets.push(new Planet(
+            this, 
+            spawnCoord.x, 
+            spawnCoord.y,
+            'planet'))
+
+    }
+    
     create()
     {
         this.spaceBackgroundStars = {
@@ -47,10 +65,12 @@ export class Space extends Phaser.Scene
                 'frontStars'
             ).setScrollFactor(0).setOrigin(0, 0),
         };
-
+        // Init planets
+        this.spawnPlanet();
         // Init player
         this.cursors = this.input.keyboard!.createCursorKeys();
         this.player = new Player(this, 400, 300, 'ship', this.cursors);
+        
         this.cameras.main.startFollow(this.player);
 
         this.playerPositionText = this.add.text(10, 10, '', { font: '16px Courier', color: '#ffffff' });
@@ -66,7 +86,7 @@ export class Space extends Phaser.Scene
         const parallaxFactor = 0.5;
         const behindStarsFactor = 0.015;
         const middleStarsFactor = 0.01;
-        const frontStarsFactor = 0.05;
+        const frontStarsFactor = 0.075;
         this.spaceBackgroundStars.behind.tilePositionX = this.cameras.main.scrollX * behindStarsFactor * parallaxFactor;
         this.spaceBackgroundStars.behind.tilePositionY = this.cameras.main.scrollY * behindStarsFactor * parallaxFactor;
         this.spaceBackgroundStars.middle.tilePositionX = this.cameras.main.scrollX * middleStarsFactor * parallaxFactor;
@@ -81,6 +101,7 @@ export class Space extends Phaser.Scene
 
     changeScene ()
     {
-        this.scene.start('MainMenu');
+        this.scene.start('menu');
+        //console.log(this.sys.game.scene.scenes)
     }
 }

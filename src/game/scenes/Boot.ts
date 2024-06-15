@@ -14,6 +14,7 @@ export class Boot extends Scene
         this.load.image('behindStars', 'assets/spaceBackground/behind_stars.png');
         this.load.image('middleStars', 'assets/spaceBackground/middle_stars.png');
         this.load.image('frontStars', 'assets/spaceBackground/front_stars.png');
+        this.load.image('planet', 'https://static.vecteezy.com/system/resources/previews/013/519/073/original/pixel-art-fictional-planet-png.png');
     }
 
     create ()

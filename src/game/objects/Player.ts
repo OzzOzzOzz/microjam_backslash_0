@@ -1,9 +1,13 @@
 // src/objects/Player.ts
 import Phaser from 'phaser';
+import OxygenTank from "./OxygenTank";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-
+    private oxygenTank: OxygenTank;
+    private oxygenBreathConsumptionBySecond: number;
+    private oxygenBurstConsumptionBySecond: number;
+    
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, cursors: Phaser.Types.Input.Keyboard.CursorKeys)
     {
         super(scene, x, y, texture);
@@ -12,6 +16,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
 
         this.cursors = cursors;
+        
+        this.oxygenTank = new OxygenTank(this.scene, this.x, this.y, 100);
+        this.oxygenBreathConsumptionBySecond = 1.0;
+        this.oxygenBurstConsumptionBySecond = 10.0;
+        
     }
     
     create ()
@@ -25,9 +34,23 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     update (time: number, delta: number)
     {
+        const delta_seconds: number = delta / 1000.0;
+        
+        // Oxygen is always consumed by breathing
+        this.oxygenTank.consumeOxygen(this.oxygenBreathConsumptionBySecond * delta_seconds);
+        
         if (this.cursors.up.isDown)
         {
-            this.scene.physics.velocityFromRotation(this.rotation, 200, this.body!.acceleration);
+            // Oxygen is lot consumed when we burst
+            if (!this.oxygenTank.isEmpty())
+            {
+                this.oxygenTank.consumeOxygen(this.oxygenBurstConsumptionBySecond * delta_seconds);
+                this.scene.physics.velocityFromRotation(this.rotation, 200, this.body!.acceleration);
+            }
+            else
+            {
+                this.setAcceleration(0);
+            }
         }
         else
         {
@@ -46,5 +69,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         {
             this.setAngularVelocity(0);
         }
+        
+        this.oxygenTank.setPosition(this.x - 26, this.y - 30);
     }
 }
