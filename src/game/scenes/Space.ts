@@ -3,8 +3,9 @@ import Player from "../objects/Player";
 import Planet from "../objects/Planet.ts";
 import Vector2 = Phaser.Math.Vector2;
 import Background from "../objects/Background.ts";
+import {GameObjects} from "phaser";
 
-type AttractedTo = { planet: Planet, distance: number }; 
+type AttractedTo = { attractionSprite: GameObjects.Sprite, distance: number }; 
 
 export class Space extends Phaser.Scene
 {
@@ -36,12 +37,8 @@ export class Space extends Phaser.Scene
             200);
         
         this.physics.add.overlap(this.player, this.singlePlanet.attractionSprite);
-        this.physics.world.on('overlap', (player: Player, planet: Planet) => {
-            this.attractedTo = { planet: planet, distance: Phaser.Math.Distance.Between(player.x, player.y, planet.x, planet.y) };
-        })
-        this.physics.world.on('overlapend', () => {
-            this.attractedTo = null;
-            console.log("OUUUUT");
+        this.physics.world.on('overlap', (player: Player, attractionSprite: GameObjects.Sprite) => {
+            this.attractedTo = { attractionSprite: attractionSprite, distance: Phaser.Math.Distance.Between(player.x, player.y, attractionSprite.x, attractionSprite.y) };
         })
         
         this.physics.add.collider(this.singlePlanet, this.player, this.collisionCallback)
@@ -98,18 +95,16 @@ export class Space extends Phaser.Scene
             }
             else
             {
-                this.player.setAcceleration(0);
-                if (this.attractedTo) {
-                    this.physics.accelerateToObject(this.player, this.attractedTo.planet, 400);
-                }            
+                this.accelerateToPlanet();
             }
         }
         else 
         {
-            this.player.setAcceleration(0);
-            if (this.attractedTo) {
-                this.physics.accelerateToObject(this.player, this.attractedTo.planet, 400);
-            }
+            this.accelerateToPlanet();
+        }
+
+        if (this.attractedTo && !Phaser.Geom.Intersects.RectangleToRectangle(this.attractedTo.attractionSprite.getBounds(), this.player.getBounds())) {
+            this.attractedTo = null;
         }
         
         //PLAYER PHYSICS
@@ -124,6 +119,13 @@ export class Space extends Phaser.Scene
         else
         {
             this.player.setAngularVelocity(0);
+        }
+    }
+
+    private accelerateToPlanet() {
+        this.player.setAcceleration(0);
+        if (this.attractedTo) {
+            this.physics.accelerateToObject(this.player, this.attractedTo.attractionSprite, (this.attractedTo.attractionSprite.displayWidth - this.attractedTo.distance) * 0.3);
         }
     }
 
