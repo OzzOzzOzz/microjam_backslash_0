@@ -36,7 +36,8 @@ export class Space extends Phaser.Scene
             this, 
             spawnCoord.x, 
             spawnCoord.y,
-            'planet'))
+            'planet',
+            200))
 
     }
     
@@ -90,7 +91,7 @@ export class Space extends Phaser.Scene
 
     changeScene ()
     {
-        this.scene.start('menu');
+        this.scene.start('Space');
         //console.log(this.sys.game.scene.scenes)
     }
 }
