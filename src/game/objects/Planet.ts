@@ -1,4 +1,5 @@
 import Phaser, {GameObjects} from 'phaser';
+
 export default class Planet extends Phaser.Physics.Arcade.Sprite {
     
     planetSprite: GameObjects.Sprite
