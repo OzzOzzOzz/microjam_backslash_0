@@ -12,11 +12,6 @@ export class Space extends Phaser.Scene
     private playerPositionText: Phaser.GameObjects.Text;
     planets: Planet[] = [];
     
-    preload()
-    {
-        this.load.image('ship', 'https://labs.phaser.io/assets/games/asteroids/ship.png');
-    }
-    
     constructor() {
         super('Space');
     }
@@ -69,16 +64,25 @@ export class Space extends Phaser.Scene
         const delta_seconds: number = delta / 1000.0;
 
         this.physics.accelerateToObject(this.player, this.planets[0], 400);
+      
         if (this.cursors.up.isDown)
         {
             if (!this.player.oxygenTank.isEmpty())
             {
                 this.player.oxygenTank.consumeOxygen(this.player.oxygenBurstConsumptionBySecond * delta_seconds);
                 this.physics.velocityFromRotation(this.player.rotation, 200, this.player.body!.acceleration);
+                this.player.thrusters.anims.play("burst", true);
+                this.player.thrusters.setVisible(true);
+            }
+        }
+
+        if (this.cursors.up.isUp) {
+            if (this.player.thrusters.anims.isPlaying) {
+                this.player.thrusters.anims.stop();
+                this.player.thrusters.setVisible(false);
             }
         }
         
-
         if (this.cursors.left.isDown)
         {
             this.player.setAngularVelocity(-300);
