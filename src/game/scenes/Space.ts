@@ -4,13 +4,16 @@ import Planet from "../objects/Planet.ts";
 import Vector2 = Phaser.Math.Vector2;
 import Background from "../objects/Background.ts";
 
+type AttractedTo = { planet: Planet, distance: number }; 
+
 export class Space extends Phaser.Scene
 {
     private player: Player;
     private background: Background;
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private playerPositionText: Phaser.GameObjects.Text;
-    planets: Planet[] = [];
+    attractedTo: AttractedTo | null = null;
+    singlePlanet: Planet;
     
     constructor() {
         super('Space');
@@ -18,14 +21,24 @@ export class Space extends Phaser.Scene
 
     spawnPlanet()
     {
-        const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(200, 100);
+        const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(1000, 1000);
 
-        this.planets.push(new Planet(
+        this.singlePlanet = new Planet(
             this, 
             spawnCoordinates.x, 
             spawnCoordinates.y,
             'planet',
-            200));
+            200);
+        
+        this.physics.add.overlap(this.player, this.singlePlanet.attractionSprite);
+        this.physics.world.on('overlap', (player: Player, planet: Planet) => {
+            this.attractedTo = { planet: planet, distance: Phaser.Math.Distance.Between(player.x, player.y, planet.x, planet.y) };
+        })
+        this.physics.world.on('overlapend', () => {
+            this.attractedTo = null;
+            console.log("OUUUUT");
+        })
+        this.physics.add.collider(this.singlePlanet, this.player, this.collisionCallback)
     }
     
     create()
@@ -50,29 +63,37 @@ export class Space extends Phaser.Scene
     
     update(time: number, delta: number)
     {
-        this.updatePhysics(time, delta);
         this.background.update(delta);
         this.player.update(time, delta);
+        this.updatePhysics(time, delta);
         
         this.playerPositionText.setText(
             `Position: (${this.player.x.toFixed(2)}, ${this.player.y.toFixed(2)})`
         );
     }
     
+    collisionCallback()
+    {
+        console.log('Bomboclat');
+    }
+    
     updatePhysics(time: number, delta: number) 
     {
         const delta_seconds: number = delta / 1000.0;
 
-        this.physics.accelerateToObject(this.player, this.planets[0], 400);
-      
-        if (this.cursors.up.isDown)
-        {
-            if (!this.player.oxygenTank.isEmpty())
-            {
+        this.physics.accelerateToObject(this.player, this.singlePlanet, 400);
+        
+        if (this.cursors.up.isDown) {
+            if (!this.player.oxygenTank.isEmpty()) {
                 this.player.oxygenTank.consumeOxygen(this.player.oxygenBurstConsumptionBySecond * delta_seconds);
                 this.physics.velocityFromRotation(this.player.rotation, 200, this.player.body!.acceleration);
                 this.player.thrusters.anims.play("burst", true);
                 this.player.thrusters.setVisible(true);
+            }
+        } else {
+            this.player.setAcceleration(0);
+            if (this.attractedTo) {
+                this.physics.accelerateToObject(this.player, this.attractedTo.planet, 400);
             }
         }
 
@@ -83,21 +104,19 @@ export class Space extends Phaser.Scene
             }
         }
         
-        if (this.cursors.left.isDown)
-        {
+        //PLAYER PHYSICS
+        if (this.cursors.left.isDown) {
             this.player.setAngularVelocity(-300);
         }
-        else if (this.cursors.right.isDown)
-        {
+        else if (this.cursors.right.isDown) {
             this.player.setAngularVelocity(300);
         }
-        else
-        {
+        else {
             this.player.setAngularVelocity(0);
         }
     }
 
-    changeScene ()
+    changeScene () 
     {
         this.scene.start('Space');
     }

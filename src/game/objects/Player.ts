@@ -1,13 +1,13 @@
 import Phaser, {GameObjects} from 'phaser';
 import OxygenTank from "./OxygenTank";
 import AnimationState = Phaser.Animations.AnimationState;
+import InventoryHUD from "./InventoryHUD.ts";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-
+    private inventoryHUD: InventoryHUD;
     oxygenTank: OxygenTank;
     oxygenBreathConsumptionBySecond: number;
     oxygenBurstConsumptionBySecond: number;
-    engine: GameObjects.Sprite;
     thrusters: GameObjects.Sprite;
     
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string)
@@ -17,20 +17,24 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.setMaxVelocity(200);
+        this.body!.onOverlap = true;
         
-        this.oxygenTank = new OxygenTank(this.scene, this.x, this.y, 100);
-        this.oxygenBreathConsumptionBySecond = 1.0;
-        this.oxygenBurstConsumptionBySecond = 10.0;
-        this.oxygenTank.depth = 1;
-        
+        // Change player z-index
         this.depth = 2;
         
-        const spriteScaleFactor = 2;
-        this.scale = spriteScaleFactor;
+        this.oxygenTank = new OxygenTank(this.scene, this.x, this.y, 100);
+        // this.oxygenBreathConsumptionBySecond = 1.0;
+        // this.oxygenBurstConsumptionBySecond = 10.0;
+        this.oxygenBreathConsumptionBySecond = 0;
+        this.oxygenBurstConsumptionBySecond = 0;
+        this.oxygenTank.depth = 1;
+
+        this.inventoryHUD = new InventoryHUD(scene, 30, 55, 3, 40, 10);
+        this.inventoryHUD.setScrollFactor(0);
+        this.inventoryHUD.addItemToSlot(0, 'ship');
         
-        this.engine = this.scene.add.sprite(x, y, 'engine');
-        this.engine.scale = spriteScaleFactor;
-        this.engine.depth = 1;
+        const spriteScaleFactor = 1.5;
+        this.scale = spriteScaleFactor;
         
         this.thrusters = this.scene.add.sprite(x, y, 'thrusters');
         this.thrusters.setVisible(false);
@@ -46,18 +50,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             repeat: -1
         })
         this.thrusters.anims.showOnStart = true;
-        this.engine.depth = 1;
     }
     
     protected preUpdate(time: number, delta: number) {
         super.preUpdate(time, delta);
         const rotation = this.rotation;
-        const enginePosition = {
-            "x": this.x,
-            "y": this.y,
-        }
-        this.engine.setRotation(rotation);
-        this.engine.setPosition(enginePosition.x, enginePosition.y);
         if (this.thrusters.anims.isPlaying) {
             const thrustersPosition = {
                 "x": this.x,
