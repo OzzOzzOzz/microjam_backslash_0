@@ -46,7 +46,5 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         {
             this.setAngularVelocity(0);
         }
-
-        this.scene.physics.world.wrap(this, 32);
     }
 }

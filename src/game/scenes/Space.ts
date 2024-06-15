@@ -7,9 +7,9 @@ export class Space extends Phaser.Scene
     private player: Player;
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private spaceBackgroundStars: {
-        "behind": GameObjects.Image,
-        "middle": GameObjects.Image,
-        "front": GameObjects.Image,
+        "behind": GameObjects.TileSprite,
+        "middle": GameObjects.TileSprite,
+        "front": GameObjects.TileSprite,
     };
     private playerPositionText: Phaser.GameObjects.Text;
     
@@ -24,28 +24,28 @@ export class Space extends Phaser.Scene
 
     create()
     {
-        const worldWidth = 2000;
-        const worldHeight = 2000;
-        this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
-
-        const screenHeight: number = this.sys.game.config.height as number;
-        const screenWidth: number = this.sys.game.config.width as number;
         this.spaceBackgroundStars = {
-            "behind": this.add.image(
-                screenWidth / 2,
-                screenHeight / 2,
+            "behind": this.add.tileSprite(
+                0,
+                0,
+                this.physics.world.bounds.width,
+                this.physics.world.bounds.height,
                 'behindStars'
-            ),
-            "middle": this.add.image(
-                screenWidth / 2,
-                screenHeight / 2,
+            ).setScrollFactor(0).setOrigin(0, 0),
+            "middle": this.add.tileSprite(
+                0,
+                0,
+                this.physics.world.bounds.width,
+                this.physics.world.bounds.height,
                 'middleStars'
-            ),
-            "front": this.add.image(
-                screenWidth / 2,
-                screenHeight / 2,
+            ).setScrollFactor(0).setOrigin(0, 0),
+            "front": this.add.tileSprite(
+                0,
+                0,
+                this.physics.world.bounds.width,
+                this.physics.world.bounds.height,
                 'frontStars'
-            ),
+            ).setScrollFactor(0).setOrigin(0, 0),
         };
 
         // Init player
@@ -62,6 +62,17 @@ export class Space extends Phaser.Scene
     update(time: number, delta: number)
     {
         this.player.update(time, delta);
+        
+        const parallaxFactor = 0.5;
+        const behindStarsFactor = 0.015;
+        const middleStarsFactor = 0.01;
+        const frontStarsFactor = 0.05;
+        this.spaceBackgroundStars.behind.tilePositionX = this.cameras.main.scrollX * behindStarsFactor * parallaxFactor;
+        this.spaceBackgroundStars.behind.tilePositionY = this.cameras.main.scrollY * behindStarsFactor * parallaxFactor;
+        this.spaceBackgroundStars.middle.tilePositionX = this.cameras.main.scrollX * middleStarsFactor * parallaxFactor;
+        this.spaceBackgroundStars.middle.tilePositionY = this.cameras.main.scrollY * middleStarsFactor * parallaxFactor;
+        this.spaceBackgroundStars.front.tilePositionX = this.cameras.main.scrollX * frontStarsFactor * parallaxFactor;
+        this.spaceBackgroundStars.front.tilePositionY = this.cameras.main.scrollY * frontStarsFactor * parallaxFactor;
         
         this.playerPositionText.setText(
             `Position: (${this.player.x.toFixed(2)}, ${this.player.y.toFixed(2)})`
