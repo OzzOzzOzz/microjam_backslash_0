@@ -54,13 +54,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     
     protected preUpdate(time: number, delta: number) {
         super.preUpdate(time, delta);
-        const rotation = this.rotation;
         if (this.thrusters.anims.isPlaying) {
             const thrustersPosition = {
                 "x": this.x,
                 "y": this.y
             }
-            this.thrusters.setRotation(rotation);
+            this.thrusters.setRotation(this.rotation);
             this.thrusters.setPosition(thrustersPosition.x, thrustersPosition.y);
         }
     }
