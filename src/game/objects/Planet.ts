@@ -17,8 +17,8 @@ export default class Planet extends Phaser.Physics.Arcade.Sprite {
 
         this.attractionSprite =  scene.physics.add.sprite(this.x, this.y, 'planet-attraction-aura').setAlpha(0.4);
         this.attractionSprite.setCircle(this.attractionSprite.texture.source[0].width / 2);
-        this.attractionSprite.displayWidth = radius * 3;
-        this.attractionSprite.displayHeight = radius * 3;
+        this.attractionSprite.displayWidth = radius * 4;
+        this.attractionSprite.displayHeight = radius * 4;
         this.attractionSprite.body!.onOverlap = true;
     }
 }

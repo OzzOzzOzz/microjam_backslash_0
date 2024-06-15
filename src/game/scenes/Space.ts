@@ -93,22 +93,22 @@ export class Space extends Phaser.Scene
 
         if (this.attractedTo && !Phaser.Geom.Intersects.RectangleToRectangle(this.attractedTo.attractionSprite.getBounds(), this.player.getBounds())) {
             this.attractedTo = null;
+        }
 
-            if (this.cursors.up.isUp) {
-                if (this.player.thrusters.anims.isPlaying) {
-                    this.player.thrusters.anims.stop();
-                    this.player.thrusters.setVisible(false);
-                }
+        if (this.cursors.up.isUp) {
+            if (this.player.thrusters.anims.isPlaying) {
+                this.player.thrusters.anims.stop();
+                this.player.thrusters.setVisible(false);
             }
+        }
 
-            //PLAYER PHYSICS
-            if (this.cursors.left.isDown) {
-                this.player.setAngularVelocity(-300);
-            } else if (this.cursors.right.isDown) {
-                this.player.setAngularVelocity(300);
-            } else {
-                this.player.setAngularVelocity(0);
-            }
+        //PLAYER PHYSICS
+        if (this.cursors.left.isDown) {
+            this.player.setAngularVelocity(-300);
+        } else if (this.cursors.right.isDown) {
+            this.player.setAngularVelocity(300);
+        } else {
+            this.player.setAngularVelocity(0);
         }
     }
 
