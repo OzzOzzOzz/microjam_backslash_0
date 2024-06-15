@@ -15,7 +15,10 @@ export class Boot extends Scene
         this.load.image('middleStars', 'assets/spaceBackground/middle_stars.png');
         this.load.image('frontStars', 'assets/spaceBackground/front_stars.png');
         
-        this.load.image('planet', 'assets/planet.png');
+        this.load.image('planet1', 'assets/Planets/planet_1.png');
+        this.load.image('planet2', 'assets/Planets/planet_2.png');
+        this.load.image('planet3', 'assets/Planets/planet_3.png');
+        this.load.image('planet4', 'assets/Planets/planet_4.png');
         this.load.image('planet-attraction-aura', 'assets/planet-attraction-aura.png');
 
         this.load.image('ship', 'assets/playerShip/ship_with_engine.png');

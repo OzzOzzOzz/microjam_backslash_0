@@ -22,14 +22,15 @@ export class Space extends Phaser.Scene
 
     spawnPlanet()
     {
-        const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(1000, 1000);
+        const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(200, 300);
 
+        console.log('planet' + Phaser.Math.Between(1, 4));
         this.singlePlanet = new Planet(
             this, 
             spawnCoordinates.x, 
             spawnCoordinates.y,
-            'planet',
-            200);
+            'planet' + Phaser.Math.Between(1, 4),
+            100);
         
         this.physics.add.overlap(this.player, this.singlePlanet.attractionSprite);
         this.physics.world.on('overlap', (player: Player, attractionSprite: GameObjects.Sprite) => {
