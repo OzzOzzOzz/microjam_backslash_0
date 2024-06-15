@@ -10,7 +10,8 @@ export class Space extends Phaser.Scene
     private background: Background;
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private playerPositionText: Phaser.GameObjects.Text;
-    planets: Planet[] = [];
+    // planets: Planet[] = [];
+    singlePlanet: Planet;
     
     preload()
     {
@@ -23,14 +24,19 @@ export class Space extends Phaser.Scene
 
     spawnPlanet()
     {
-        const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(200, 100);
+        const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(1000, 1000);
 
-        this.planets.push(new Planet(
+        this.singlePlanet = new Planet(
             this, 
             spawnCoordinates.x, 
             spawnCoordinates.y,
             'planet',
-            200));
+            200);
+
+        // this.planets.push(currentPlanet);
+        
+        this.physics.add.collider(this.singlePlanet, this.player, this.collisionCallback)
+
     }
     
     create()
@@ -64,11 +70,16 @@ export class Space extends Phaser.Scene
         );
     }
     
+    collisionCallback()
+    {
+        console.log('Bomboclat');
+    }
+    
     updatePhysics(time: number, delta: number) 
     {
         const delta_seconds: number = delta / 1000.0;
 
-        this.physics.accelerateToObject(this.player, this.planets[0], 400);
+        this.physics.accelerateToObject(this.player, this.singlePlanet, 400);
         if (this.cursors.up.isDown)
         {
             if (!this.player.oxygenTank.isEmpty())
@@ -78,7 +89,7 @@ export class Space extends Phaser.Scene
             }
         }
         
-
+        //PLAYER PHYSICS
         if (this.cursors.left.isDown)
         {
             this.player.setAngularVelocity(-300);
@@ -92,7 +103,7 @@ export class Space extends Phaser.Scene
             this.player.setAngularVelocity(0);
         }
     }
-
+    
     changeScene ()
     {
         this.scene.start('Space');
