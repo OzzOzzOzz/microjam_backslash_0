@@ -12,6 +12,7 @@ export default class Planet extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
         
         this.body!.setCircle(this.texture.source[0].width / 2);
+        this.setImmovable(true);
         this.displayWidth = radius;
         this.displayHeight = radius;
 
