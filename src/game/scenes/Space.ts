@@ -1,24 +1,17 @@
-import { GameObjects } from 'phaser';
 import { EventBus } from '../EventBus';
 import Player from "../objects/Player";
 import Planet from "../objects/Planet.ts";
 import Vector2 = Phaser.Math.Vector2;
+import Background from "../objects/Background.ts";
 
 export class Space extends Phaser.Scene
 {
     private player: Player;
+    private background: Background;
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-    private spaceBackgroundStars: {
-        "behind": GameObjects.Image,
-        "middle": GameObjects.Image,
-        "front": GameObjects.Image,
-    };
     private playerPositionText: Phaser.GameObjects.Text;
-    
-    spaceBackground: GameObjects.Image;
     planets: Planet[] = [];
-
-
+    
     preload()
     {
         this.load.image('ship', 'https://labs.phaser.io/assets/games/asteroids/ship.png');
@@ -30,51 +23,28 @@ export class Space extends Phaser.Scene
 
     spawnPlanet()
     {
-        const spawnCoord: Vector2 = new Phaser.Math.Vector2(200, 100);
+        const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(200, 100);
 
         this.planets.push(new Planet(
             this, 
-            spawnCoord.x, 
-            spawnCoord.y,
-            'planet',
-            this.player
-        ))
+            spawnCoordinates.x, 
+            spawnCoordinates.y,
+            'planet'));
     }
     
     create()
     {
-        const worldWidth = 2000;
-        const worldHeight = 2000;
-        this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
-
-        const screenHeight: number = this.sys.game.config.height as number;
-        const screenWidth: number = this.sys.game.config.width as number;
-        this.spaceBackgroundStars = {
-            "behind": this.add.image(
-                screenWidth / 2,
-                screenHeight / 2,
-                'behindStars'
-            ),
-            "middle": this.add.image(
-                screenWidth / 2,
-                screenHeight / 2,
-                'middleStars'
-            ),
-            "front": this.add.image(
-                screenWidth / 2,
-                screenHeight / 2,
-                'frontStars'
-            ),
-        };
-
+        // Init Background
+        this.background = new Background(this);
+        
         // Init player
         this.cursors = this.input.keyboard!.createCursorKeys();
-        this.player = new Player(this, 400, 300, 'ship', this.cursors);
-        
+        this.player = new Player(this, 400, 300, 'ship');
         this.cameras.main.startFollow(this.player);
 
         this.playerPositionText = this.add.text(10, 10, '', { font: '16px Courier', color: '#ffffff' });
-        this.playerPositionText.setScrollFactor(0); // Ensure the text stays in the same place on the screen
+        // Ensure the text stays in the same place on the screen
+        this.playerPositionText.setScrollFactor(0);
 
         // Init planets
         this.spawnPlanet();
@@ -82,25 +52,31 @@ export class Space extends Phaser.Scene
         EventBus.emit('current-scene-ready', this);
     }
     
-    update()
+    update(time: number, delta: number)
     {
-        this.updatePhysics();
+        this.updatePhysics(time, delta);
+        this.background.update(delta);
+        this.player.update(time, delta);
         
         this.playerPositionText.setText(
             `Position: (${this.player.x.toFixed(2)}, ${this.player.y.toFixed(2)})`
         );
     }
     
-    updatePhysics() 
+    updatePhysics(time: number, delta: number) 
     {
+        const delta_seconds: number = delta / 1000.0;
+
+        this.physics.accelerateToObject(this.player, this.planets[0], 400);
         if (this.cursors.up.isDown)
         {
-            this.player.scene.physics.velocityFromRotation(this.player.rotation, 200, this.player.body!.acceleration);
+            if (!this.player.oxygenTank.isEmpty())
+            {
+                this.player.oxygenTank.consumeOxygen(this.player.oxygenBurstConsumptionBySecond * delta_seconds);
+                this.physics.velocityFromRotation(this.player.rotation, 200, this.player.body!.acceleration);
+            }
         }
-        else
-        {
-            this.physics.accelerateToObject(this.player, this.planets[0], 100);
-        }
+        
 
         if (this.cursors.left.isDown)
         {
@@ -118,6 +94,6 @@ export class Space extends Phaser.Scene
 
     changeScene ()
     {
-        this.scene.start('menu');
+        this.scene.start('Space');
     }
 }
