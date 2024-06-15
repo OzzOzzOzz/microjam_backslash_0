@@ -28,7 +28,8 @@ export class Space extends Phaser.Scene
         );
         this.cursors = this.input.keyboard!.createCursorKeys();
         this.player = new Player(this, 400, 300, 'ship', this.cursors);
-        
+        this.cameras.main.startFollow(this.player);
+
         EventBus.emit('current-scene-ready', this);
     }
     
