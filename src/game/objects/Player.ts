@@ -1,9 +1,11 @@
 // src/objects/Player.ts
 import Phaser from 'phaser';
+import OxygenTank from "./OxygenTank";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-
+    private oxygenTank: OxygenTank
+    
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, cursors: Phaser.Types.Input.Keyboard.CursorKeys)
     {
         super(scene, x, y, texture);
@@ -12,6 +14,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
 
         this.cursors = cursors;
+        this.oxygenTank = new OxygenTank(this.scene, this.x, this.y, 100);
     }
     
     create ()
@@ -25,9 +28,21 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     update (time: number, delta: number)
     {
+        // Oxygen is always consumed by breathing
+        this.oxygenTank.consumeOxygen(0.01);
+        
         if (this.cursors.up.isDown)
         {
-            this.scene.physics.velocityFromRotation(this.rotation, 200, this.body!.acceleration);
+            // Oxygen is lot consumed when we burst
+            if (!this.oxygenTank.isEmpty())
+            {
+                this.oxygenTank.consumeOxygen(0.7);
+                this.scene.physics.velocityFromRotation(this.rotation, 200, this.body!.acceleration);
+            }
+            else
+            {
+                this.setAcceleration(0);
+            }
         }
         else
         {
@@ -48,5 +63,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         this.scene.physics.world.wrap(this, 32);
+        this.oxygenTank.setPosition(this.x - 26, this.y - 30);
     }
 }
