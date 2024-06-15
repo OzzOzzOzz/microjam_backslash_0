@@ -16,11 +16,6 @@ export class Space extends Phaser.Scene
     attractedTo: AttractedTo | null = null;
     singlePlanet: Planet;
     
-    preload()
-    {
-        this.load.image('ship', 'https://labs.phaser.io/assets/games/asteroids/ship.png');
-    }
-    
     constructor() {
         super('Space');
     }
@@ -40,9 +35,7 @@ export class Space extends Phaser.Scene
         this.physics.world.on('overlap', (player: Player, attractionSprite: GameObjects.Sprite) => {
             this.attractedTo = { attractionSprite: attractionSprite, distance: Phaser.Math.Distance.Between(player.x, player.y, attractionSprite.x, attractionSprite.y) };
         })
-        
         this.physics.add.collider(this.singlePlanet, this.player, this.collisionCallback)
-
     }
     
     create()
@@ -81,44 +74,41 @@ export class Space extends Phaser.Scene
         console.log('Bomboclat');
     }
     
-    updatePhysics(time: number, delta: number) 
-    {
+    updatePhysics(time: number, delta: number) {
         const delta_seconds: number = delta / 1000.0;
 
 
-        if (this.cursors.up.isDown)
-        {
-            if (!this.player.oxygenTank.isEmpty())
-            {
+        if (this.cursors.up.isDown) {
+            if (!this.player.oxygenTank.isEmpty()) {
                 this.player.oxygenTank.consumeOxygen(this.player.oxygenBurstConsumptionBySecond * delta_seconds);
                 this.physics.velocityFromRotation(this.player.rotation, 200, this.player.body!.acceleration);
-            }
-            else
-            {
+                this.player.thrusters.anims.play("burst", true);
+                this.player.thrusters.setVisible(true);
+            } else {
                 this.accelerateToPlanet();
             }
-        }
-        else 
-        {
+        } else {
             this.accelerateToPlanet();
         }
 
         if (this.attractedTo && !Phaser.Geom.Intersects.RectangleToRectangle(this.attractedTo.attractionSprite.getBounds(), this.player.getBounds())) {
             this.attractedTo = null;
-        }
-        
-        //PLAYER PHYSICS
-        if (this.cursors.left.isDown)
-        {
-            this.player.setAngularVelocity(-300);
-        }
-        else if (this.cursors.right.isDown)
-        {
-            this.player.setAngularVelocity(300);
-        }
-        else
-        {
-            this.player.setAngularVelocity(0);
+
+            if (this.cursors.up.isUp) {
+                if (this.player.thrusters.anims.isPlaying) {
+                    this.player.thrusters.anims.stop();
+                    this.player.thrusters.setVisible(false);
+                }
+            }
+
+            //PLAYER PHYSICS
+            if (this.cursors.left.isDown) {
+                this.player.setAngularVelocity(-300);
+            } else if (this.cursors.right.isDown) {
+                this.player.setAngularVelocity(300);
+            } else {
+                this.player.setAngularVelocity(0);
+            }
         }
     }
 
@@ -129,8 +119,7 @@ export class Space extends Phaser.Scene
         }
     }
 
-    changeScene ()
-    {
+    changeScene () {
         this.scene.start('Space');
     }
 }
