@@ -36,7 +36,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             // Oxygen is lot consumed when we burst
             if (!this.oxygenTank.isEmpty())
             {
-                this.oxygenTank.consumeOxygen(0.7);
+                this.oxygenTank.consumeOxygen(0.2);
                 this.scene.physics.velocityFromRotation(this.rotation, 200, this.body!.acceleration);
             }
             else
