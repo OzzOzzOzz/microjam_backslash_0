@@ -64,5 +64,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.scene.physics.world.wrap(this, 32);
         this.oxygenTank.setPosition(this.x - 26, this.y - 30);
+        //this.scene.physics.world.wrap(this, 302);
     }
 }

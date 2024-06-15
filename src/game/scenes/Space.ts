@@ -1,6 +1,8 @@
 import { GameObjects } from 'phaser';
 import { EventBus } from '../EventBus';
 import Player from "../objects/Player";
+import Planet from "../objects/Planet.ts";
+import Vector2 = Phaser.Math.Vector2;
 
 export class Space extends Phaser.Scene
 {
@@ -13,6 +15,10 @@ export class Space extends Phaser.Scene
     };
     private playerPositionText: Phaser.GameObjects.Text;
     
+    spaceBackground: GameObjects.Image;
+    planets: Planet[] = [];
+
+
     preload()
     {
         this.load.image('ship', 'https://labs.phaser.io/assets/games/asteroids/ship.png');
@@ -22,6 +28,18 @@ export class Space extends Phaser.Scene
         super('Space');
     }
 
+    spawnPlanet()
+    {
+        const spawnCoord: Vector2 = new Phaser.Math.Vector2(200, 100);
+
+        this.planets.push(new Planet(
+            this, 
+            spawnCoord.x, 
+            spawnCoord.y,
+            'planet'))
+
+    }
+    
     create()
     {
         const worldWidth = 2000;
@@ -47,10 +65,12 @@ export class Space extends Phaser.Scene
                 'frontStars'
             ),
         };
-
+        // Init planets
+        this.spawnPlanet();
         // Init player
         this.cursors = this.input.keyboard!.createCursorKeys();
         this.player = new Player(this, 400, 300, 'ship', this.cursors);
+        
         this.cameras.main.startFollow(this.player);
 
         this.playerPositionText = this.add.text(10, 10, '', { font: '16px Courier', color: '#ffffff' });
@@ -70,6 +90,7 @@ export class Space extends Phaser.Scene
 
     changeScene ()
     {
-        this.scene.start('MainMenu');
+        this.scene.start('menu');
+        //console.log(this.sys.game.scene.scenes)
     }
 }
