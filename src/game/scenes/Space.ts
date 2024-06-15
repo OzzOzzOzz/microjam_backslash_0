@@ -36,8 +36,9 @@ export class Space extends Phaser.Scene
             this, 
             spawnCoord.x, 
             spawnCoord.y,
-            'planet'))
-
+            'planet',
+            this.player
+        ))
     }
     
     create()
@@ -65,8 +66,7 @@ export class Space extends Phaser.Scene
                 'frontStars'
             ),
         };
-        // Init planets
-        this.spawnPlanet();
+
         // Init player
         this.cursors = this.input.keyboard!.createCursorKeys();
         this.player = new Player(this, 400, 300, 'ship', this.cursors);
@@ -76,21 +76,48 @@ export class Space extends Phaser.Scene
         this.playerPositionText = this.add.text(10, 10, '', { font: '16px Courier', color: '#ffffff' });
         this.playerPositionText.setScrollFactor(0); // Ensure the text stays in the same place on the screen
 
+        // Init planets
+        this.spawnPlanet();
+        
         EventBus.emit('current-scene-ready', this);
     }
     
-    update(time: number, delta: number)
+    update()
     {
-        this.player.update(time, delta);
+        this.updatePhysics();
         
         this.playerPositionText.setText(
             `Position: (${this.player.x.toFixed(2)}, ${this.player.y.toFixed(2)})`
         );
     }
+    
+    updatePhysics() 
+    {
+        if (this.cursors.up.isDown)
+        {
+            this.player.scene.physics.velocityFromRotation(this.player.rotation, 200, this.player.body!.acceleration);
+        }
+        else
+        {
+            this.physics.accelerateToObject(this.player, this.planets[0], 100);
+        }
+
+        if (this.cursors.left.isDown)
+        {
+            this.player.setAngularVelocity(-300);
+        }
+        else if (this.cursors.right.isDown)
+        {
+            this.player.setAngularVelocity(300);
+        }
+        else
+        {
+            this.player.setAngularVelocity(0);
+        }
+    }
 
     changeScene ()
     {
         this.scene.start('menu');
-        //console.log(this.sys.game.scene.scenes)
     }
 }
