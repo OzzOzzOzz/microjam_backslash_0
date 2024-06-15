@@ -127,7 +127,7 @@ export class Space extends Phaser.Scene
     private accelerateToPlanet() {
         this.player.setAcceleration(0);
         if (this.attractedTo) {
-            this.physics.accelerateToObject(this.player, this.attractedTo.attractionSprite, (this.attractedTo.attractionSprite.displayWidth - this.attractedTo.distance) * 0.3);
+            this.physics.accelerateToObject(this.player, this.attractedTo.attractionSprite, (this.attractedTo.attractionSprite.displayWidth - this.attractedTo.distance) * 0.5);
         }
     }
 
