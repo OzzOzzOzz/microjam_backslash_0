@@ -11,7 +11,6 @@ export class Space extends Phaser.Scene
         "middle": GameObjects.Image,
         "front": GameObjects.Image,
     };
-    private camera: Phaser.Cameras.Scene2D.Camera;
     private playerPositionText: Phaser.GameObjects.Text;
     
     preload()
