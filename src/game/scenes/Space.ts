@@ -61,9 +61,9 @@ export class Space extends Phaser.Scene
     
     update(time: number, delta: number)
     {
-        this.updatePhysics(time, delta);
         this.background.update(delta);
         this.player.update(time, delta);
+        this.updatePhysics(time, delta);
         
         this.playerPositionText.setText(
             `Position: (${this.player.x.toFixed(2)}, ${this.player.y.toFixed(2)})`
@@ -82,11 +82,22 @@ export class Space extends Phaser.Scene
         this.physics.accelerateToObject(this.player, this.singlePlanet, 400);
         if (this.cursors.up.isDown)
         {
+            this.physics.accelerateToObject(this.player, this.planets[0], 400);
             if (!this.player.oxygenTank.isEmpty())
             {
                 this.player.oxygenTank.consumeOxygen(this.player.oxygenBurstConsumptionBySecond * delta_seconds);
                 this.physics.velocityFromRotation(this.player.rotation, 200, this.player.body!.acceleration);
             }
+            else
+            {
+                this.player.setAcceleration(0);
+                this.physics.accelerateToObject(this.player, this.planets[0], 400);
+            }
+        }
+        else
+        {
+            this.player.setAcceleration(0);
+            this.physics.accelerateToObject(this.player, this.planets[0], 400);
         }
         
         //PLAYER PHYSICS
@@ -103,7 +114,7 @@ export class Space extends Phaser.Scene
             this.player.setAngularVelocity(0);
         }
     }
-    
+
     changeScene ()
     {
         this.scene.start('Space');

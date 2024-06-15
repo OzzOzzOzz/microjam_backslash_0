@@ -1,9 +1,11 @@
 // src/objects/Player.ts
 import Phaser from 'phaser';
 import OxygenTank from "./OxygenTank";
+import InventoryHUD from "./InventoryHUD.ts";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
 
+    private inventoryHUD: InventoryHUD;
     oxygenTank: OxygenTank;
     oxygenBreathConsumptionBySecond: number;
     oxygenBurstConsumptionBySecond: number;
@@ -20,6 +22,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.oxygenBreathConsumptionBySecond = 1.0;
         this.oxygenBurstConsumptionBySecond = 10.0;
         
+        this.inventoryHUD = new InventoryHUD(scene, 30, 55, 3, 40, 10);
+        this.inventoryHUD.setScrollFactor(0);
+        this.inventoryHUD.addItemToSlot(0, 'ship');
     }
 
     update (time: number, delta: number)
