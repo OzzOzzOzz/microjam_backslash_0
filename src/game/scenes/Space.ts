@@ -4,13 +4,15 @@ import Planet from "../objects/Planet.ts";
 import Vector2 = Phaser.Math.Vector2;
 import Background from "../objects/Background.ts";
 
+type AttractedTo = { planet: Planet, distance: number }; 
+
 export class Space extends Phaser.Scene
 {
     private player: Player;
     private background: Background;
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private playerPositionText: Phaser.GameObjects.Text;
-    // planets: Planet[] = [];
+    attractedTo: AttractedTo | null = null;
     singlePlanet: Planet;
     
     preload()
@@ -32,8 +34,15 @@ export class Space extends Phaser.Scene
             spawnCoordinates.y,
             'planet',
             200);
-
-        // this.planets.push(currentPlanet);
+        
+        this.physics.add.overlap(this.player, this.singlePlanet.attractionSprite);
+        this.physics.world.on('overlap', (player: Player, planet: Planet) => {
+            this.attractedTo = { planet: planet, distance: Phaser.Math.Distance.Between(player.x, player.y, planet.x, planet.y) };
+        })
+        this.physics.world.on('overlapend', () => {
+            this.attractedTo = null;
+            console.log("OUUUUT");
+        })
         
         this.physics.add.collider(this.singlePlanet, this.player, this.collisionCallback)
 
@@ -79,10 +88,9 @@ export class Space extends Phaser.Scene
     {
         const delta_seconds: number = delta / 1000.0;
 
-        this.physics.accelerateToObject(this.player, this.singlePlanet, 400);
+
         if (this.cursors.up.isDown)
         {
-            this.physics.accelerateToObject(this.player, this.singlePlanet, 400);
             if (!this.player.oxygenTank.isEmpty())
             {
                 this.player.oxygenTank.consumeOxygen(this.player.oxygenBurstConsumptionBySecond * delta_seconds);
@@ -91,13 +99,17 @@ export class Space extends Phaser.Scene
             else
             {
                 this.player.setAcceleration(0);
-                this.physics.accelerateToObject(this.player, this.singlePlanet, 400);
+                if (this.attractedTo) {
+                    this.physics.accelerateToObject(this.player, this.attractedTo.planet, 400);
+                }            
             }
         }
-        else
+        else 
         {
             this.player.setAcceleration(0);
-            this.physics.accelerateToObject(this.player, this.singlePlanet, 400);
+            if (this.attractedTo) {
+                this.physics.accelerateToObject(this.player, this.attractedTo.planet, 400);
+            }
         }
         
         //PLAYER PHYSICS

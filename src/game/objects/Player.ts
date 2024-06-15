@@ -17,6 +17,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.setMaxVelocity(200);
+        this.body!.onOverlap = true;
         
         this.oxygenTank = new OxygenTank(this.scene, this.x, this.y, 100);
         // this.oxygenBreathConsumptionBySecond = 1.0;

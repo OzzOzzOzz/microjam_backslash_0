@@ -15,6 +15,7 @@ export class Boot extends Scene
         this.load.image('middleStars', 'assets/spaceBackground/middle_stars.png');
         this.load.image('frontStars', 'assets/spaceBackground/front_stars.png');
         this.load.image('planet', 'assets/planet.png');
+        this.load.image('planet-attraction-aura', 'assets/planet-attraction-aura.png');
     }
 
     create ()
