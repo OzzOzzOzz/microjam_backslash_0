@@ -56,26 +56,24 @@ const changePlanetCreationType = () => {
 <template>
     <PhaserGame ref="phaserRef" />
     <div>
-        <div class="subText">
-            <p>Scene: {{phaserRef?.scene?.scene?.key}}</p>
-        </div>
-        <div>
-            <button class="button" @click="resetScene">Reset Scene</button>
-        </div>
-        <div v-if="isGodMod" class="godModText">
-            <p>GOD MOD</p>
-        </div>
-        <div>
+        <div class="bottom">
+            <div v-if="isGodMod" class="godModText">
+                <p>GOD MOD</p>
+            </div>
             <button class="button" @click="toggleGodMod">Toggle god mod</button>
-        </div>
-        <div v-if="isGodMod" class="subText">
-            <p>Planet type: {{planetCreationType}}</p>
-        </div>
-        <div>
-            <button v-if="isGodMod" class="button" @click="changePlanetCreationType">Change planet type</button>
-        </div>
-        <div>
-            <button v-if="isGodMod" class="button" @click="downloadMap">Download map</button>
+            <div v-if="isGodMod">
+                <div class="subText">
+                    <p>Scene: {{phaserRef?.scene?.scene?.key}}</p>
+                </div>
+                <div>
+                    <button class="button" @click="resetScene">Reset Scene</button>
+                </div>
+                <div v-if="isGodMod" class="subText">
+                    <p>Planet type: {{planetCreationType}}</p>
+                </div>
+                <button class="button" @click="changePlanetCreationType">Change planet type</button>
+                <button v-if="isGodMod" class="button" @click="downloadMap">Download map</button>
+            </div>
         </div>
     </div>
 </template>
