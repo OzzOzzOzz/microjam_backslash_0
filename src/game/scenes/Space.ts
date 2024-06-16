@@ -109,7 +109,7 @@ export class Space extends Phaser.Scene
             }
         }
         this.playerPositionText.setText(
-            `Position: (${this.player.x.toFixed(2)}, ${this.player.y.toFixed(2)})`
+            `Position: (${this.player.x.toFixed(2)}, ${this.player.y.toFixed(2)}) Speed: ${this.player.body?.velocity.length()}`
         );
     }
     
@@ -158,7 +158,7 @@ export class Space extends Phaser.Scene
     private accelerateToPlanet() {
         this.player.setAcceleration(0);
         if (this.attractedTo) {
-            this.physics.accelerateToObject(this.player, this.attractedTo.attractionSprite, (this.attractedTo.attractionSprite.displayWidth - this.attractedTo.distance) * 0.5);
+            this.physics.accelerateToObject(this.player, this.attractedTo.attractionSprite, (this.attractedTo.attractionSprite.displayWidth / this.attractedTo.distance) * 16);
         }
     }
 
