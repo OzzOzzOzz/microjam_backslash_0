@@ -3,6 +3,7 @@ import Player from "../objects/Player";
 import Vector2 = Phaser.Math.Vector2;
 import Background from "../objects/Background.ts";
 import {GameObjects} from "phaser";
+import StaticGroup = Phaser.Physics.Arcade.StaticGroup;
 
 type AttractedTo = { attractionSprite: GameObjects.Sprite, distance: number }; 
 
@@ -15,7 +16,8 @@ export class Space extends Phaser.Scene
     private gameOverText: Phaser.GameObjects.Text;
     attractedTo: AttractedTo | null = null;
     private isGameOver: boolean;
-    planets: Phaser.Physics.Arcade.StaticGroup;
+    planets: StaticGroup;
+    shipParts: StaticGroup;
     
     constructor() {
         super('Space');
@@ -95,7 +97,7 @@ export class Space extends Phaser.Scene
     update(time: number, delta: number)
     {
         this.checkOxygenLevels();
-        if (this.cursors.space.isDown) {
+        if (this.isGameOver && this.cursors.space.isDown) {
             this.scene.start('Space');
         }
         this.background.update(delta);
