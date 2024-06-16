@@ -149,6 +149,9 @@ export class Space extends Phaser.Scene
     updatePhysics(time: number, delta: number) {
         const delta_seconds: number = delta / 1000.0;
 
+        if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+            this.sound.play('reactor', { volume: 0.5, loop: true });
+        }
         // Oxygen is always consumed by breathing
         this.player.oxygenTank.consumeOxygen(this.player.oxygenBreathConsumptionBySecond * delta_seconds);
         if (this.cursors.up.isDown) {
@@ -169,6 +172,7 @@ export class Space extends Phaser.Scene
         }
 
         if (this.cursors.up.isUp) {
+            this.sound.stopByKey('reactor');
             if (this.player.thrusters.anims.isPlaying) {
                 this.player.thrusters.anims.stop();
                 this.player.thrusters.setVisible(false);
