@@ -334,7 +334,6 @@ export class Space extends Phaser.Scene {
     
     collisionCallback()
     {
-        console.log('Bomboclat');
         this.player.oxygenTank.setOxygen(100);
     }
     
