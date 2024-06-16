@@ -7,8 +7,7 @@ import StaticGroup = Phaser.Physics.Arcade.StaticGroup;
 
 type AttractedTo = { attractionSprite: GameObjects.Sprite, distance: number }; 
 
-export class Space extends Phaser.Scene
-{
+export class Space extends Phaser.Scene {
     private player: Player;
     private background: Background;
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -17,15 +16,15 @@ export class Space extends Phaser.Scene
     attractedTo: AttractedTo | null = null;
     private isGameOver: boolean;
     planets: StaticGroup;
-    
+    private isUnzooming: boolean = false;
+
     constructor() {
         super('Space');
     }
 
-    spawnPlanet(posX: number, posY: number, radius: number)
-    {
+    spawnPlanet(posX: number, posY: number, radius: number) {
         const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(posX, posY);
-        
+
         let planet = this.planets.create(
             spawnCoordinates.x,
             spawnCoordinates.y,
@@ -35,19 +34,19 @@ export class Space extends Phaser.Scene
         planet.displayWidth = radius;
         planet.displayHeight = radius;
 
-        const attractionCircleRadius:number = radius * 3;
+        const attractionCircleRadius: number = radius * 3;
         let attractionSprite = this.physics.add.sprite(
             spawnCoordinates.x,
-            spawnCoordinates.y, 
+            spawnCoordinates.y,
             'planet-attraction-aura'
         ).setAlpha(0.4);
         attractionSprite.setCircle(attractionSprite.texture.source[0].width / 2);
         attractionSprite.displayWidth = attractionCircleRadius;
-        attractionSprite.displayHeight =  attractionCircleRadius;
+        attractionSprite.displayHeight = attractionCircleRadius;
 
         this.physics.add.overlap(this.player, attractionSprite, this.overlapCallback, undefined, this);
         this.physics.add.collider(this.planets, this.player, this.collisionCallback, undefined, this);
-        
+
         this.planets.refresh();
     }
 
@@ -65,8 +64,14 @@ export class Space extends Phaser.Scene
         // Init Background
         this.background = new Background(this);
         
-        // Init player
         this.cursors = this.input.keyboard!.createCursorKeys();
+        
+        // Zoom
+        this.input.keyboard!.on('keydown-W', this.unzoom, this);
+        this.input.keyboard!.on('keydown-S', this.zoom, this);
+
+
+        // Init player
         this.player = new Player(this, 400, 300, 'ship');
         this.cameras.main.startFollow(this.player);
 
@@ -80,7 +85,20 @@ export class Space extends Phaser.Scene
         this.spawnPlanet(1000, 1000, 100);
         this.spawnPlanet(1600, 1000, 200);
         this.spawnPlanet(1600, 1600, 300);
-        
+
+        const hudElements: [GameObjects.GameObject] =
+            [
+                this.player.inventoryHUD, 
+                this.playerPositionText,
+            ];
+        let hudCamera = this.cameras.add(0, 0, this.scale.width, this.scale.height);
+        hudCamera.setScroll(0, 0);
+        hudCamera.ignore(this.children.list.filter(child => 
+                !hudElements.includes(child)
+            )
+        );
+        this.cameras.main.ignore(this.children.list.filter(child => hudElements.includes(child)));
+
         EventBus.emit('current-scene-ready', this);
     }
 
@@ -111,6 +129,8 @@ export class Space extends Phaser.Scene
                 this.gameOverText.setVisible(false);
             }
         }
+        
+        // this.cameras.main.ignore(this.playerPositionText);
         this.playerPositionText.setText(
             `Position: (${this.player.x.toFixed(0)}, ${this.player.y.toFixed(0)}) Speed: ${this.player.body.velocity.length().toFixed(0)}`
         );
@@ -165,6 +185,32 @@ export class Space extends Phaser.Scene
         if (this.attractedTo) {
             this.physics.accelerateToObject(this.player, this.attractedTo.attractionSprite, (this.attractedTo.attractionSprite.displayWidth / this.attractedTo.distance) * 32);
         }
+    }
+    
+    zoom()
+    {
+        // Handle it properly
+        this.tweens.add({
+            targets: this.cameras.main, // The camera we want to affect
+            zoom: 1, // The target zoom level
+            duration: 1000, // Duration of the tween in milliseconds
+            ease: 'Sine.easeInOut', // Easing function for smooth animation
+            yoyo: false, // If true, the tween will play in reverse after reaching the target value
+            repeat: 0 // Number of times the tween should repeat (0 means it will play once)
+        });
+    }
+
+    unzoom()
+    {
+        // if is on planet
+        this.tweens.add({
+            targets: this.cameras.main, // The camera we want to affect
+            zoom: 0.1, // The target zoom level
+            duration: 1000, // Duration of the tween in milliseconds
+            ease: 'Sine.easeInOut', // Easing function for smooth animation
+            yoyo: false, // If true, the tween will play in reverse after reaching the target value
+            repeat: 0 // Number of times the tween should repeat (0 means it will play once)
+        });
     }
 
     changeScene () {

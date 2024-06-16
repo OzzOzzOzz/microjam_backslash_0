@@ -4,7 +4,7 @@ import AnimationState = Phaser.Animations.AnimationState;
 import InventoryHUD from "./InventoryHUD.ts";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-    private inventoryHUD: InventoryHUD;
+    inventoryHUD: InventoryHUD;
     oxygenTank: OxygenTank;
     oxygenBreathConsumptionBySecond: number;
     oxygenBurstConsumptionBySecond: number;
