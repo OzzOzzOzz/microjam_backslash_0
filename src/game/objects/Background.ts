@@ -39,7 +39,6 @@ export default class Background {
 
     update (delta: number)
     {
-        console.log(delta)
         const parallaxFactor = 0.4;
         const behindStarsFactor = 0.015 * parallaxFactor;
         const middleStarsFactor = 0.1 * parallaxFactor;

@@ -45,7 +45,7 @@ export class Space extends Phaser.Scene
         attractionSprite.displayHeight =  attractionCircleRadius;
 
         this.physics.add.overlap(this.player, attractionSprite, this.overlapCallback, undefined, this);
-        this.physics.add.collider(this.planets, this.player, this.collisionCallback);
+        this.physics.add.collider(this.planets, this.player, this.collisionCallback, undefined, this);
         
         this.planets.refresh();
     }
@@ -76,7 +76,7 @@ export class Space extends Phaser.Scene
 
         // Init planets
         this.planets = this.physics.add.staticGroup();
-        this.spawnPlanet(1000, 1000, 200);
+        this.spawnPlanet(1000, 1000, 100);
         this.spawnPlanet(1600, 1000, 200);
         
         EventBus.emit('current-scene-ready', this);
@@ -117,6 +117,7 @@ export class Space extends Phaser.Scene
     collisionCallback()
     {
         console.log('Bomboclat');
+        this.player.oxygenTank.setOxygen(100);
     }
     
     updatePhysics(time: number, delta: number) {
