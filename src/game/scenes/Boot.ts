@@ -26,6 +26,8 @@ export class Boot extends Scene
 
         this.load.image('ship', 'assets/playerShip/ship_with_engine.png');
         this.load.spritesheet('thrusters', 'assets/playerShip/ship_thrusters.png', { frameWidth: 48, frameHeight: 48 });
+
+        this.load.json('map', "map/map.json")
     }
 
     create ()

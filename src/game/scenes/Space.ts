@@ -65,10 +65,10 @@ export class Space extends Phaser.Scene
             console.log(planet);
             return {
                 position: {
-                    x: planet!.body!.position.x,
-                    y: planet!.body!.position.y
+                    x: planet!.body!.position.x + planet!.body!.radius,
+                    y: planet!.body!.position.y + planet!.body!.radius
                 },
-                radius: planet!.body!.radius,
+                radius: planet!.body!.radius * 2,
             };
         })
         const map = {
@@ -80,6 +80,20 @@ export class Space extends Phaser.Scene
         link.download = "map";
         link.click();
         URL.revokeObjectURL(link.href);
+    }
+    
+    loadMap()
+    {
+        this.planets = this.physics.add.staticGroup();
+        
+        const mapData = this.cache.json.get('map');
+        mapData.planets.forEach(planetJson =>
+            this.spawnPlanet(
+                planetJson.position.x,
+                planetJson.position.y,
+                planetJson.radius
+            )
+        );
     }
     
     spawnPlanet(posX: number, posY: number, radius: number) {
@@ -171,11 +185,7 @@ export class Space extends Phaser.Scene
         );
 
         // Init planets
-        this.planets = this.physics.add.staticGroup();
-        this.spawnPlanet(1000, 1000, 100);
-        this.spawnPlanet(1600, 1000, 200);
-        this.spawnPlanet(1600, 1600, 300);
-
+        this.loadMap();
 
         EventBus.emit('current-scene-ready', this);
     }
