@@ -79,6 +79,7 @@ export class Space extends Phaser.Scene
         this.planets = this.physics.add.staticGroup();
         this.spawnPlanet(1000, 1000, 100);
         this.spawnPlanet(1600, 1000, 200);
+        this.spawnPlanet(1600, 1600, 300);
         
         EventBus.emit('current-scene-ready', this);
     }
@@ -111,8 +112,9 @@ export class Space extends Phaser.Scene
             }
         }
         this.playerPositionText.setText(
-            `Position: (${this.player.x.toFixed(2)}, ${this.player.y.toFixed(2)}) Speed: ${this.player.body?.velocity.length()}`
+            `Position: (${this.player.x.toFixed(0)}, ${this.player.y.toFixed(0)}) Speed: ${this.player.body.velocity.length().toFixed(0)}`
         );
+
     }
     
     collisionCallback()
@@ -161,7 +163,7 @@ export class Space extends Phaser.Scene
     private accelerateToPlanet() {
         this.player.setAcceleration(0);
         if (this.attractedTo) {
-            this.physics.accelerateToObject(this.player, this.attractedTo.attractionSprite, (this.attractedTo.attractionSprite.displayWidth / this.attractedTo.distance) * 16);
+            this.physics.accelerateToObject(this.player, this.attractedTo.attractionSprite, (this.attractedTo.attractionSprite.displayWidth / this.attractedTo.distance) * 32);
         }
     }
 
