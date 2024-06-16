@@ -19,30 +19,31 @@ export default class Background {
                 this.scene.physics.world.bounds.width,
                 this.scene.physics.world.bounds.height,
                 'behindStars'
-            ).setScrollFactor(0).setOrigin(0, 0),
+            ).setScrollFactor(0).setOrigin(0, 0).setTileScale(2, 2),
             "middle": this.scene.add.tileSprite(
                 0,
                 0,
                 this.scene.physics.world.bounds.width,
                 this.scene.physics.world.bounds.height,
                 'middleStars'
-            ).setScrollFactor(0).setOrigin(0, 0),
+            ).setScrollFactor(0).setOrigin(0, 0).setTileScale(2, 2),
             "front": this.scene.add.tileSprite(
                 0,
                 0,
                 this.scene.physics.world.bounds.width,
                 this.scene.physics.world.bounds.height,
                 'frontStars'
-            ).setScrollFactor(0).setOrigin(0, 0),
+            ).setScrollFactor(0).setOrigin(0, 0).setTileScale(2, 2),
         };
     }
 
     update (delta: number)
     {
-        const parallaxFactor = 0.03 * delta;
+        console.log(delta)
+        const parallaxFactor = 0.4;
         const behindStarsFactor = 0.015 * parallaxFactor;
-        const middleStarsFactor = 0.01 * parallaxFactor;
-        const frontStarsFactor = 0.075 * parallaxFactor;
+        const middleStarsFactor = 0.1 * parallaxFactor;
+        const frontStarsFactor = 0.75 * parallaxFactor;
         this.spaceBackgroundStars.behind.tilePositionX = this.scene.cameras.main.scrollX * behindStarsFactor;
         this.spaceBackgroundStars.behind.tilePositionY = this.scene.cameras.main.scrollY * behindStarsFactor;
         this.spaceBackgroundStars.middle.tilePositionX = this.scene.cameras.main.scrollX * middleStarsFactor;

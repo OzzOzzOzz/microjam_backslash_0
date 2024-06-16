@@ -34,14 +34,15 @@ export class Space extends Phaser.Scene
         planet.displayWidth = radius;
         planet.displayHeight = radius;
 
+        const attractionCircleRadius:number = radius * 3;
         let attractionSprite = this.physics.add.sprite(
             spawnCoordinates.x,
             spawnCoordinates.y, 
             'planet-attraction-aura'
         ).setAlpha(0.4);
         attractionSprite.setCircle(attractionSprite.texture.source[0].width / 2);
-        attractionSprite.displayWidth = radius * 4;
-        attractionSprite.displayHeight = radius * 4;
+        attractionSprite.displayWidth = attractionCircleRadius;
+        attractionSprite.displayHeight =  attractionCircleRadius;
 
         this.physics.add.overlap(this.player, attractionSprite, this.overlapCallback, undefined, this);
         this.physics.add.collider(this.planets, this.player, this.collisionCallback);
