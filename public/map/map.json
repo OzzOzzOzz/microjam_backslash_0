@@ -1,36 +1,196 @@
 {
-  "planets": [
-    {
-      "position": {
-        "x": 781,
-        "y": 165.5
-      },
-      "radius": 125,
-      "resourceIndex": -1
-    },
-    {
-      "position": {
-        "x": 843,
-        "y": 558.5
-      },
-      "radius": 125,
-      "resourceIndex": 0
-    },
-    {
-      "position": {
-        "x": 364,
-        "y": 657.5
-      },
-      "radius": 125,
-      "resourceIndex": 1
-    },
-    {
-      "position": {
-        "x": 193,
-        "y": 240.5
-      },
-      "radius": 125,
-      "resourceIndex": 2
-    }
-  ]
+    "planets": [
+        {
+            "position": {
+                "x": 648,
+                "y": -72
+            },
+            "radius": 125,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": -176,
+                "y": -722
+            },
+            "radius": 200,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 1042,
+                "y": -906
+            },
+            "radius": 200,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 588,
+                "y": -1723
+            },
+            "radius": 300,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": -739,
+                "y": -3362
+            },
+            "radius": 300,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 638.6206484567374,
+                "y": -2857.308846107586
+            },
+            "radius": 125,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 693.6206476371735,
+                "y": -3832.3088315789537
+            },
+            "radius": 125,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": -821.3793297875679,
+                "y": -4737.308818093403
+            },
+            "radius": 125,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 538.6206499468535,
+                "y": -4922.308815336688
+            },
+            "radius": 200,
+            "resourceIndex": 0
+        },
+        {
+            "position": {
+                "x": 1488.0245469615606,
+                "y": -4235.584797890121
+            },
+            "radius": 125,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 2281.375062568617,
+                "y": -5423.482115664219
+            },
+            "radius": 200,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 1554.8686614003745,
+                "y": -3007.602465484866
+            },
+            "radius": 200,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 3192.835721835643,
+                "y": -4230.5963336580435
+            },
+            "radius": 200,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 3438.060853808728,
+                "y": -2458.021668816542
+            },
+            "radius": 300,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 4220.0906228992935,
+                "y": -3806.2515484885926
+            },
+            "radius": 125,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 4013.039330032345,
+                "y": -5274.214037184127
+            },
+            "radius": 125,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 5174.256469155352,
+                "y": -4298.871567363899
+            },
+            "radius": 200,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 4739.122392617207,
+                "y": -2741.3513465323404
+            },
+            "radius": 125,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 2725.0718386963836,
+                "y": -1578.5942986399582
+            },
+            "radius": 125,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 4304.8282987338225,
+                "y": -1236.1376191705551
+            },
+            "radius": 200,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 5743.066236917694,
+                "y": -1510.3222961874935
+            },
+            "radius": 200,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 5852.3814251668855,
+                "y": -3076.7177050894925
+            },
+            "radius": 300,
+            "resourceIndex": -1
+        },
+        {
+            "position": {
+                "x": 7219.803605675649,
+                "y": -4623.55376518569
+            },
+            "radius": 125,
+            "resourceIndex": 1
+        },
+        {
+            "position": {
+                "x": 8000.7924804241475,
+                "y": -2192.009794478925
+            },
+            "radius": 125,
+            "resourceIndex": 2
+        }
+    ]
 }
