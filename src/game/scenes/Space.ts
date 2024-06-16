@@ -321,7 +321,7 @@ export class Space extends Phaser.Scene {
         // }
         if (playerRotationVec.normalize().dot(player2PlanetVec.normalize()) > -0.7) {
             console.log("OUYAAA")
-            return false;
+            return true;
         }
         return true;
         
