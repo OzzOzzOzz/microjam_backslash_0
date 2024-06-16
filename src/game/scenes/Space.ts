@@ -137,9 +137,6 @@ export class Space extends Phaser.Scene {
                 this.setPlanetResource(planetJson.resourceIndex, planet);
             }
         );
-        console.log(this.planetRefResource1);
-        console.log(this.planetRefResource2);
-        console.log(this.planetRefResource3);
     }
 
     spawnPlanet(posX: number, posY: number, radius: number) {
