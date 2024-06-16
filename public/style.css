@@ -43,7 +43,7 @@ body {
 
     &:active {
         background-color: #0ec3c9;
-    }
+    }   
 
     /* Disabled styles */
     &:disabled {
@@ -53,6 +53,20 @@ body {
     }
 }
 
+#game-container {
+    position: absolute;
+    left: 20px;
+}
+
+.sideText {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    right: 0;
+    width: 20%;
+    height: 100vh
+}
 .godModText {
     background-color: darkred;
     color: black;
@@ -60,6 +74,16 @@ body {
 }
 
 .bottom {
-    position: absolute;
-    bottom: 0;
+}
+
+.history {
+    font-size: 20px;
+    white-space: pre-wrap;
+    padding: 32px;
+    text-align: justify;
+}
+
+.command {
+    font-size: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.87);
 }

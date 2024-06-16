@@ -151,7 +151,7 @@ export class Space extends Phaser.Scene
 
         const screenCenterX = 24;
         const screenCenterY = this.cameras.main.height - 120;
-        this.gameOverText = this.add.text(screenCenterX, screenCenterY, ['No oxygen left.','Press SPACE to retry'], { font: '48px dimitri', color: '#C70039', stroke: '#ffffff', strokeThickness: 2, align: 'justify' }).setOrigin(0).setScrollFactor(0).setVisible(false);
+        this.gameOverText = this.add.text(screenCenterX, screenCenterY, ['No fuel left.','Press SPACE to retry'], { font: '48px dimitri', color: '#C70039', stroke: '#ffffff', strokeThickness: 2, align: 'justify' }).setOrigin(0).setScrollFactor(0).setVisible(false);
         this.playerPositionText = this.add.text(10, 10, '', { font: '16px dimitri', color: '#ffffff' }).setScrollFactor(0);
 
         const hudElements: [GameObjects.GameObject] =
@@ -187,6 +187,11 @@ export class Space extends Phaser.Scene
                 this.isGameOver = true;
                 this.gameOverText.setVisible(true);
             }
+        } else {
+            if (this.isGameOver) {
+                this.isGameOver = false;
+                this.gameOverText.setVisible(false);
+            }
         }
     }
     
@@ -199,7 +204,7 @@ export class Space extends Phaser.Scene
             this.updatePhysics(time, delta);
             this.checkOxygenLevels();
             if (this.isGameOver && this.cursors.space.isDown) {
-                this.scene.start('Space');
+                this.restart()
             }
             if (this.isGameOver) {
                 if (time % 1000 < 500) {
@@ -220,7 +225,6 @@ export class Space extends Phaser.Scene
     }
 
     private restart() {
-        console.log('Restart');
         this.sound.stopAll();
         this.scene.start('Space');
     }
@@ -234,7 +238,7 @@ export class Space extends Phaser.Scene
     updatePhysics(time: number, delta: number) {
         const delta_seconds: number = delta / 1000.0;
 
-        if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+        if (Phaser.Input.Keyboard.JustDown(this.cursors.up) && !this.player.oxygenTank.isEmpty()) {
             this.sound.play('reactor', { volume: 0.5, loop: true });
         }
         // Oxygen is always consumed by breathing

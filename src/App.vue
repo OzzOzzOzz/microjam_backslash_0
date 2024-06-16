@@ -55,7 +55,23 @@ const changePlanetCreationType = () => {
 
 <template>
     <PhaserGame ref="phaserRef" />
-    <div>
+    <div class="sideText">
+        <div class="history">
+            <p>A meteorite has hit your space ship! You should find your missing pieces to fix your LIGHT SPEED ENGINE.
+            There's 3 missing pieces.</p>
+            <p>You should explore the near by planets to find them.</p>
+            <p>
+            As your engine is 
+            broken you don't have much fuel left. Also, one last thing you should be able to re fill your fuel
+            by exploiting the petrol on a planet but be careful on the landing...
+            </p>
+        </div>
+        <div class="command">
+            <p>Rotate ship = <b>LEFT</b> or <b>RIGHT</b></p>
+            <p>Fire power engine = <b>UP</b></p>
+            <p>Zoom out = <b>W</b></p>
+            <p>Zoom in = <b>S</b></p>
+        </div>
         <div class="bottom">
             <div v-if="isGodMod" class="godModText">
                 <p>GOD MOD</p>
