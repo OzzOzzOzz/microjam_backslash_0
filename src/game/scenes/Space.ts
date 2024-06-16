@@ -316,15 +316,15 @@ export class Space extends Phaser.Scene {
         // graphics.strokeRectShape(rect);
        
         // console.log(playerRotationVec.normalize().dot(player2PlanetVec.normalize()))
+        // if(this.player.body.velocity.length() > 300) {
+        //     console.log("yo")
+        // }
         if (playerRotationVec.normalize().dot(player2PlanetVec.normalize()) > -0.7) {
             console.log("OUYAAA")
             return false;
         }
         return true;
         
-        if(this.player.body.velocity.length() > 300) {
-            console.log("yo")
-        }
     }
     
     collisionCallback()
