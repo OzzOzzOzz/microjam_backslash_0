@@ -68,11 +68,11 @@ const changePlanetCreationType = () => {
                 <div>
                     <button class="button" @click="resetScene">Reset Scene</button>
                 </div>
-                <div v-if="isGodMod" class="subText">
+                <div class="subText">
                     <p>Planet type: {{planetCreationType}}</p>
                 </div>
                 <button class="button" @click="changePlanetCreationType">Change planet type</button>
-                <button v-if="isGodMod" class="button" @click="downloadMap">Download map</button>
+                <button class="button" @click="downloadMap">Download map</button>
             </div>
         </div>
     </div>
