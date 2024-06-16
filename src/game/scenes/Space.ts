@@ -17,7 +17,6 @@ export class Space extends Phaser.Scene
     attractedTo: AttractedTo | null = null;
     private isGameOver: boolean;
     planets: StaticGroup;
-    shipParts: StaticGroup;
     
     constructor() {
         super('Space');
