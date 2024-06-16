@@ -10,6 +10,7 @@ type AttractedTo = { attractionSprite: GameObjects.Sprite, distance: number };
 export class Space extends Phaser.Scene
 {
     isGodMod: boolean;
+    planetCreationType: number;
     private player: Player;
     private background: Background;
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -18,6 +19,7 @@ export class Space extends Phaser.Scene
     attractedTo: AttractedTo | null = null;
     private isGameOver: boolean;
     planets: StaticGroup;
+    private hudCamera: Phaser.Cameras.Scene2D.Camera;
     
     constructor() {
         super('Space');
@@ -31,6 +33,69 @@ export class Space extends Phaser.Scene
         }
     }
 
+    spawnSpecificPlanet(posX: number, posY: number, type: number) {
+        let radius: number = 125;
+        if (type === 1) {
+            radius = 125;
+        } else if (type === 2) {
+            radius = 200;
+        } else if (type === 3) {
+            radius = 300;
+        }
+        this.spawnPlanet(posX, posY, radius);
+    }
+
+    changePlanetCreationType(newType: number) {
+        this.planetCreationType = newType;
+    }
+    
+    onClickCallback() {
+        if (!this.isGodMod) {
+            return;
+        }
+        const coordinates = {
+            x: this.input.activePointer.worldX,
+            y: this.input.activePointer.worldY,
+        };
+        this.spawnSpecificPlanet(coordinates.x, coordinates.y, this.planetCreationType);
+    }
+
+    downloadMap() {
+        const planetMap = this.planets.getChildren().map((planet)  => {
+            console.log(planet);
+            return {
+                position: {
+                    x: planet!.body!.position.x + planet!.body!.radius,
+                    y: planet!.body!.position.y + planet!.body!.radius
+                },
+                radius: planet!.body!.radius * 2,
+            };
+        })
+        const map = {
+            planets: planetMap
+        };
+        const blob = new Blob([JSON.stringify(map, null, 2)], { type: 'application/json' })
+        const link = document.createElement('a')
+        link.href = URL.createObjectURL(blob)
+        link.download = "map";
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+    
+    loadMap()
+    {
+        this.planets = this.physics.add.staticGroup();
+        
+        const mapData = this.cache.json.get('map');
+        mapData.planets.forEach(planetJson =>
+            this.spawnPlanet(
+                planetJson.position.x,
+                planetJson.position.y,
+                planetJson.radius
+            )
+        );
+    }
+    
     spawnPlanet(posX: number, posY: number, radius: number) {
         const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(posX, posY);
 
@@ -39,6 +104,7 @@ export class Space extends Phaser.Scene
             spawnCoordinates.y,
             'planet' + Phaser.Math.Between(1, 4)
         );
+        planet.setOrigin(0.5);
         planet.setCircle(radius / 2);
         planet.displayWidth = radius;
         planet.displayHeight = radius;
@@ -57,6 +123,9 @@ export class Space extends Phaser.Scene
         this.physics.add.collider(this.planets, this.player, this.collisionCallback, undefined, this);
 
         this.planets.refresh();
+        
+        this.hudCamera.ignore(planet);
+        this.hudCamera.ignore(attractionSprite);
     }
 
     overlapCallback(player, planet) {
@@ -65,10 +134,16 @@ export class Space extends Phaser.Scene
             distance: Phaser.Math.Distance.Between(player.x, player.y, planet.x, planet.y)
         };
     }
-
+    
     create()
     {
-        this.physics.world.drawDebug = false;
+        if (!this.isGodMod) {
+            this.physics.world.drawDebug = false;
+        }
+        // Default planet creation type (size)
+        this.planetCreationType = 1;
+        // Click event listener for godmod planet creation
+        this.input.on('pointerdown', this.onClickCallback, this);
         
         this.isGameOver = false;
         // Init Music
@@ -80,7 +155,7 @@ export class Space extends Phaser.Scene
         this.cursors = this.input.keyboard!.createCursorKeys();
         
         // Zoom
-        this.input.keyboard!.on('keydown-W', this.unzoom, this);
+        this.input.keyboard!.on('keydown-W', this.unZoom, this);
         this.input.keyboard!.on('keydown-S', this.zoom, this);
 
 
@@ -90,27 +165,27 @@ export class Space extends Phaser.Scene
 
         const screenCenterX = 24;
         const screenCenterY = this.cameras.main.height - 120;
-        this.gameOverText = this.add.text(screenCenterX, screenCenterY, ['No oxygen left.','Press SPACE to retry'], { font: '48px dimitri', color: '#C70039', stroke: '#ffffff', strokeThickness: 2, align: 'justify' }).setOrigin(0).setScrollFactor(0).setVisible(false);
+        this.gameOverText = this.add.text(screenCenterX, screenCenterY, ['No fuel left.','Press SPACE to retry'], { font: '48px dimitri', color: '#C70039', stroke: '#ffffff', strokeThickness: 2, align: 'justify' }).setOrigin(0).setScrollFactor(0).setVisible(false);
         this.playerPositionText = this.add.text(10, 10, '', { font: '16px dimitri', color: '#ffffff' }).setScrollFactor(0);
-
-        // Init planets
-        this.planets = this.physics.add.staticGroup();
-        this.spawnPlanet(1000, 1000, 100);
-        this.spawnPlanet(1600, 1000, 200);
-        this.spawnPlanet(1600, 1600, 300);
 
         const hudElements: [GameObjects.GameObject] =
             [
                 this.player.inventoryHUD, 
                 this.playerPositionText,
             ];
-        let hudCamera = this.cameras.add(0, 0, this.scale.width, this.scale.height);
-        hudCamera.setScroll(0, 0);
-        hudCamera.ignore(this.children.list.filter(child => 
+        this.hudCamera = this.cameras.add(0, 0, this.scale.width, this.scale.height);
+        this.hudCamera.setScroll(0, 0);
+        this.hudCamera.ignore(this.children.list.filter(child => 
                 !hudElements.includes(child)
             )
         );
-        this.cameras.main.ignore(this.children.list.filter(child => hudElements.includes(child)));
+        this.cameras.main.ignore(this.children.list.filter(child =>
+                hudElements.includes(child)
+            )
+        );
+
+        // Init planets
+        this.loadMap();
 
         EventBus.emit('current-scene-ready', this);
     }
@@ -121,6 +196,11 @@ export class Space extends Phaser.Scene
             if (!this.isGameOver) {
                 this.isGameOver = true;
                 this.gameOverText.setVisible(true);
+            }
+        } else {
+            if (this.isGameOver) {
+                this.isGameOver = false;
+                this.gameOverText.setVisible(false);
             }
         }
     }
@@ -134,7 +214,7 @@ export class Space extends Phaser.Scene
             this.updatePhysics(time, delta);
             this.checkOxygenLevels();
             if (this.isGameOver && this.cursors.space.isDown) {
-                this.scene.start('Space');
+                this.restart()
             }
             if (this.isGameOver) {
                 if (time % 1000 < 500) {
@@ -155,7 +235,6 @@ export class Space extends Phaser.Scene
     }
 
     private restart() {
-        console.log('Restart');
         this.sound.stopAll();
         this.scene.start('Space');
     }
@@ -169,7 +248,7 @@ export class Space extends Phaser.Scene
     updatePhysics(time: number, delta: number) {
         const delta_seconds: number = delta / 1000.0;
 
-        if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+        if (Phaser.Input.Keyboard.JustDown(this.cursors.up) && !this.player.oxygenTank.isEmpty()) {
             this.sound.play('reactor', { volume: 0.5, loop: true });
         }
         // Oxygen is always consumed by breathing
@@ -246,7 +325,7 @@ export class Space extends Phaser.Scene
         });
     }
 
-    unzoom()
+    unZoom()
     {
         // if is on planet
         this.tweens.add({
