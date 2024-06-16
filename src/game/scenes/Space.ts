@@ -61,6 +61,8 @@ export class Space extends Phaser.Scene
     create()
     {
         this.isGameOver = false;
+        // Init Music
+        this.sound.play('lewis-hamilton-project', { loop: true });
         
         // Init Background
         this.background = new Background(this);
@@ -98,7 +100,7 @@ export class Space extends Phaser.Scene
     {
         this.checkOxygenLevels();
         if (this.isGameOver && this.cursors.space.isDown) {
-            this.scene.start('Space');
+            this.restart();
         }
         this.background.update(delta);
         this.player.update(time, delta);
@@ -116,7 +118,13 @@ export class Space extends Phaser.Scene
         );
 
     }
-    
+
+    private restart() {
+        console.log('Restart');
+        this.sound.stopAll();
+        this.scene.start('Space');
+    }
+
     collisionCallback()
     {
         console.log('Bomboclat');
@@ -168,6 +176,6 @@ export class Space extends Phaser.Scene
     }
 
     changeScene () {
-        this.scene.start('Space');
+        this.restart()
     }
 }
