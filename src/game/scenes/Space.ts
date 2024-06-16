@@ -31,7 +31,6 @@ export class Space extends Phaser.Scene
         planet.setCircle(radius / 2);
         planet.displayWidth = radius;
         planet.displayHeight = radius;
-        planet.body.setOffset(radius * 2, radius * 2);
 
         let attractionSprite = this.physics.add.sprite(
             spawnCoordinates.x,
@@ -44,6 +43,8 @@ export class Space extends Phaser.Scene
 
         this.physics.add.overlap(this.player, attractionSprite, this.overlapCallback, undefined, this);
         this.physics.add.collider(this.planets, this.player, this.collisionCallback);
+        
+        this.planets.refresh();
     }
 
     overlapCallback(player, planet) {
@@ -70,6 +71,7 @@ export class Space extends Phaser.Scene
         // Init planets
         this.planets = this.physics.add.staticGroup();
         this.spawnPlanet(1000, 1000, 200);
+        this.spawnPlanet(1600, 1000, 200);
         
         EventBus.emit('current-scene-ready', this);
     }
