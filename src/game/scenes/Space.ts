@@ -237,7 +237,6 @@ export class Space extends Phaser.Scene {
 
         // Init planets
         this.loadMap();
-
         EventBus.emit('current-scene-ready', this);
     }
 
