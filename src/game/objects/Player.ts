@@ -18,6 +18,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
         this.setMaxVelocity(200);
         this.body!.onOverlap = true;
+        this.body?.setCircle(this.texture.source[0].width / 2)
         
         // Change player z-index
         this.depth = 2;
