@@ -4,6 +4,7 @@ import Planet from "../objects/Planet.ts";
 import Vector2 = Phaser.Math.Vector2;
 import Background from "../objects/Background.ts";
 import {GameObjects} from "phaser";
+import TextStyle = Phaser.GameObjects.TextStyle;
 
 type AttractedTo = { attractionSprite: GameObjects.Sprite, distance: number }; 
 
@@ -13,8 +14,10 @@ export class Space extends Phaser.Scene
     private background: Background;
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private playerPositionText: Phaser.GameObjects.Text;
+    private gameOverText: Phaser.GameObjects.Text;
     attractedTo: AttractedTo | null = null;
     singlePlanet: Planet;
+    private isGameOver: boolean;
     
     constructor() {
         super('Space');
@@ -41,6 +44,8 @@ export class Space extends Phaser.Scene
     
     create()
     {
+        this.isGameOver = false;
+        
         // Init Background
         this.background = new Background(this);
         
@@ -49,22 +54,43 @@ export class Space extends Phaser.Scene
         this.player = new Player(this, 400, 300, 'ship');
         this.cameras.main.startFollow(this.player);
 
-        this.playerPositionText = this.add.text(10, 10, '', { font: '16px Courier', color: '#ffffff' });
-        // Ensure the text stays in the same place on the screen
-        this.playerPositionText.setScrollFactor(0);
+        const screenCenterX = 24;
+        const screenCenterY = this.cameras.main.height - 120;
+        this.gameOverText = this.add.text(screenCenterX, screenCenterY, ['No oxygen left.','Press SPACE to retry'], { font: '48px dimitri', color: '#C70039', stroke: '#ffffff', strokeThickness: 2, align: 'justify' }).setOrigin(0).setScrollFactor(0).setVisible(false);
+        this.playerPositionText = this.add.text(10, 10, '', { font: '16px dimitri', color: '#ffffff' }).setScrollFactor(0);
 
         // Init planets
         this.spawnPlanet();
         
         EventBus.emit('current-scene-ready', this);
     }
+
+
+    checkOxygenLevels() {
+        if (this.player.oxygenTank.isEmpty()) {
+            console.log('coucou')
+            this.isGameOver = true;
+            this.gameOverText.setVisible(true);
+        }
+    }
     
     update(time: number, delta: number)
     {
+        this.checkOxygenLevels();
+        if (this.cursors.space.isDown) {
+            this.scene.start('Space');
+        }
         this.background.update(delta);
         this.player.update(time, delta);
         this.updatePhysics(time, delta);
-        
+
+        if (this.isGameOver) {
+            if (time % 1000 < 500) {
+                this.gameOverText.setVisible(true);
+            } else {
+                this.gameOverText.setVisible(false);
+            }
+        }
         this.playerPositionText.setText(
             `Position: (${this.player.x.toFixed(2)}, ${this.player.y.toFixed(2)})`
         );
@@ -77,7 +103,6 @@ export class Space extends Phaser.Scene
     
     updatePhysics(time: number, delta: number) {
         const delta_seconds: number = delta / 1000.0;
-
 
         if (this.cursors.up.isDown) {
             if (!this.player.oxygenTank.isEmpty()) {
