@@ -11,7 +11,7 @@ export default class OxygenTank extends Phaser.GameObjects.Container {
         this.maxOxygen = maxOxygen;
         this.currentOxygen = maxOxygen;
 
-        this.bar = new Phaser.GameObjects.Graphics(scene);
+        this.bar = new Phaser.GameObjects.Graphics(scene).setAlpha(0.5);
         this.add(this.bar);
 
         this.draw();
