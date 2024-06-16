@@ -25,6 +25,9 @@ export class Boot extends Scene
         this.load.image('planet-attraction-aura', 'assets/Planets/planet-attraction-aura.png');
 
         this.load.image('ship', 'assets/playerShip/ship_with_engine.png');
+        this.load.image('shipPart1', 'assets/shipParts/part1.png');
+        this.load.image('shipPart2', 'assets/shipParts/part2.png');
+        this.load.image('shipPart3', 'assets/shipParts/part3.png');
         this.load.spritesheet('thrusters', 'assets/playerShip/ship_thrusters.png', { frameWidth: 48, frameHeight: 48 });
 
         this.load.json('map', "map/map.json")

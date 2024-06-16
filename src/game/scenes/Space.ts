@@ -20,6 +20,9 @@ export class Space extends Phaser.Scene
     private isGameOver: boolean;
     planets: StaticGroup;
     private hudCamera: Phaser.Cameras.Scene2D.Camera;
+    private shipPart1:GameObjects.Sprite;
+    private shipPart2:GameObjects.Sprite;
+    private shipPart3:GameObjects.Sprite;
     
     constructor() {
         super('Space');
@@ -94,6 +97,16 @@ export class Space extends Phaser.Scene
                 planetJson.radius
             )
         );
+        
+        // this.shipPart1 = this.add.sprite(50, 50, 'shipPart1').setOrigin(0.5).setScrollFactor(0);
+        // this.shipPart1.scale = 1.5;
+        // this.shipPart1.postFX.addShine(2, 0.5, 1.5);
+        // this.shipPart2 = this.add.sprite(150, 150, 'shipPart2').setOrigin(0.5).setScrollFactor(0);
+        // this.shipPart2.scale = 1.5;
+        // this.shipPart2.postFX.addShine(2, 0.5, 1.5);
+        // this.shipPart3 = this.add.sprite(300, 300, 'shipPart3').setOrigin(0.5).setScrollFactor(0);
+        // this.shipPart3.scale = 1.5;
+        // this.shipPart3.postFX.addShine(2, 0.5, 1.5);
     }
     
     spawnPlanet(posX: number, posY: number, radius: number) {
@@ -157,8 +170,7 @@ export class Space extends Phaser.Scene
         // Zoom
         this.input.keyboard!.on('keydown-W', this.unZoom, this);
         this.input.keyboard!.on('keydown-S', this.zoom, this);
-
-
+        
         // Init player
         this.player = new Player(this, 400, 300, 'ship');
         this.cameras.main.startFollow(this.player);
