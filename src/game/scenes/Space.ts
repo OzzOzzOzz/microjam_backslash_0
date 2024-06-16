@@ -251,7 +251,7 @@ export class Space extends Phaser.Scene
         // if is on planet
         this.tweens.add({
             targets: this.cameras.main, // The camera we want to affect
-            zoom: 0.1, // The target zoom level
+            zoom: 0.2, // The target zoom level
             duration: 1000, // Duration of the tween in milliseconds
             ease: 'Sine.easeInOut', // Easing function for smooth animation
             yoyo: false, // If true, the tween will play in reverse after reaching the target value
