@@ -8,6 +8,7 @@ import {Space} from "./game/scenes/Space.ts";
 const phaserRef = ref();
 const isGodMod = ref(false);
 const planetCreationType = ref(1);
+const resourceCreationType = ref(-1);
 
 const resetScene = () => {
     const scene = toRaw(phaserRef.value.scene) as MainMenu;
@@ -51,6 +52,15 @@ const changePlanetCreationType = () => {
     (scene as Space).changePlanetCreationType(planetCreationType.value);
 }
 
+const changeResourceIndex = () => {
+    resourceCreationType.value += 1;
+    if (resourceCreationType.value > 2) {
+        resourceCreationType.value = -1;
+    }
+    const scene = toRaw(phaserRef.value.scene) as Space;
+    (scene as Space).changeResourceCreationType(resourceCreationType.value);
+}
+
 </script>
 
 <template>
@@ -88,6 +98,10 @@ const changePlanetCreationType = () => {
                     <p>Planet type: {{planetCreationType}}</p>
                 </div>
                 <button class="button" @click="changePlanetCreationType">Change planet type</button>
+                <div class="subText">
+                    <p>Resource type: {{resourceCreationType}}</p>
+                </div>
+                <button class="button" @click="changeResourceIndex">Change resource index</button>
                 <button class="button" @click="downloadMap">Download map</button>
             </div>
         </div>

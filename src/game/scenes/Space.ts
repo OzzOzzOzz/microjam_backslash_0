@@ -7,10 +7,10 @@ import StaticGroup = Phaser.Physics.Arcade.StaticGroup;
 
 type AttractedTo = { attractionSprite: GameObjects.Sprite, distance: number }; 
 
-export class Space extends Phaser.Scene
-{
+export class Space extends Phaser.Scene {
     isGodMod: boolean;
     planetCreationType: number;
+    resourceCreationType: number;
     private player: Player;
     private background: Background;
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -20,23 +20,23 @@ export class Space extends Phaser.Scene
     private isGameOver: boolean;
     planets: StaticGroup;
     private hudCamera: Phaser.Cameras.Scene2D.Camera;
-    private shipPart1:GameObjects.Sprite;
-    private shipPart2:GameObjects.Sprite;
-    private shipPart3:GameObjects.Sprite;
-    
+    private planetRefResource1: GameObjects.GameObject;
+    private planetRefResource2: GameObjects.GameObject;
+    private planetRefResource3: GameObjects.GameObject;
+
     constructor() {
         super('Space');
     }
-    
+
     toggleGodMod() {
         this.isGodMod = !this.isGodMod;
-        this.physics.world.drawDebug =  !this.physics.world.drawDebug;
+        this.physics.world.drawDebug = !this.physics.world.drawDebug;
         if (!this.physics.world.drawDebug) {
             this.physics.world.debugGraphic.clear()
         }
     }
 
-    spawnSpecificPlanet(posX: number, posY: number, type: number) {
+    spawnSpecificPlanet(posX: number, posY: number, type: number, resourceType: number) {
         let radius: number = 125;
         if (type === 1) {
             radius = 125;
@@ -45,13 +45,32 @@ export class Space extends Phaser.Scene
         } else if (type === 3) {
             radius = 300;
         }
-        this.spawnPlanet(posX, posY, radius);
+        const planetRef = this.spawnPlanet(posX, posY, radius);
+        this.setPlanetResource(resourceType, planetRef);
+    }
+
+    private setPlanetResource(resourceType: number, planetRef) {
+        if (resourceType != -1) {
+            if (resourceType == 0) {
+                this.planetRefResource1 = planetRef;
+            }
+            if (resourceType == 1) {
+                this.planetRefResource2 = planetRef;
+            }
+            if (resourceType == 2) {
+                this.planetRefResource3 = planetRef;
+            }
+        }
     }
 
     changePlanetCreationType(newType: number) {
         this.planetCreationType = newType;
     }
     
+    changeResourceCreationType(newType: number) {
+        this.resourceCreationType = newType;
+    }
+
     onClickCallback() {
         if (!this.isGodMod) {
             return;
@@ -60,42 +79,61 @@ export class Space extends Phaser.Scene
             x: this.input.activePointer.worldX,
             y: this.input.activePointer.worldY,
         };
-        this.spawnSpecificPlanet(coordinates.x, coordinates.y, this.planetCreationType);
+        this.spawnSpecificPlanet(coordinates.x, coordinates.y, this.planetCreationType, this.resourceCreationType);
+    }
+    
+    getResourceIndex(planet)
+    {
+        if (this.planetRefResource1 == planet)
+        {
+            return 0;
+        }
+        if (this.planetRefResource2 == planet)
+        {
+            return 1;
+        }
+        if (this.planetRefResource3 == planet)
+        {
+            return 2;
+        }
+        return -1;
     }
 
     downloadMap() {
-        const planetMap = this.planets.getChildren().map((planet)  => {
-            console.log(planet);
+        const planetMap = this.planets.getChildren().map((planet) => {
             return {
                 position: {
                     x: planet!.body!.position.x + planet!.body!.radius,
                     y: planet!.body!.position.y + planet!.body!.radius
                 },
                 radius: planet!.body!.radius * 2,
+                resourceIndex: this.getResourceIndex(planet)
             };
         })
         const map = {
             planets: planetMap
         };
-        const blob = new Blob([JSON.stringify(map, null, 2)], { type: 'application/json' })
+        const blob = new Blob([JSON.stringify(map, null, 2)], {type: 'application/json'})
         const link = document.createElement('a')
         link.href = URL.createObjectURL(blob)
         link.download = "map";
         link.click();
         URL.revokeObjectURL(link.href);
     }
-    
-    loadMap()
-    {
+
+    loadMap() {
         this.planets = this.physics.add.staticGroup();
-        
+
         const mapData = this.cache.json.get('map');
         mapData.planets.forEach(planetJson =>
-            this.spawnPlanet(
-                planetJson.position.x,
-                planetJson.position.y,
-                planetJson.radius
-            )
+            {
+                const planet = this.spawnPlanet(
+                    planetJson.position.x,
+                    planetJson.position.y,
+                    planetJson.radius
+                );
+                this.setPlanetResource(planetJson.resourceIndex, planet);
+            }
         );
         
         // this.shipPart1 = this.add.sprite(50, 50, 'shipPart1').setOrigin(0.5).setScrollFactor(0);
@@ -108,7 +146,7 @@ export class Space extends Phaser.Scene
         // this.shipPart3.scale = 1.5;
         // this.shipPart3.postFX.addShine(2, 0.5, 1.5);
     }
-    
+
     spawnPlanet(posX: number, posY: number, radius: number) {
         const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(posX, posY);
 
@@ -133,12 +171,14 @@ export class Space extends Phaser.Scene
         attractionSprite.displayHeight = attractionCircleRadius;
 
         this.physics.add.overlap(this.player, attractionSprite, this.overlapCallback, undefined, this);
-        this.physics.add.collider(this.planets, this.player, this.collisionCallback, undefined, this);
+        this.physics.add.collider(this.planets, this.player, this.collisionCallback, this.crashCallback, this);
 
         this.planets.refresh();
-        
+
         this.hudCamera.ignore(planet);
         this.hudCamera.ignore(attractionSprite);
+        
+        return planet;
     }
 
     overlapCallback(player, planet) {
@@ -155,6 +195,10 @@ export class Space extends Phaser.Scene
         }
         // Default planet creation type (size)
         this.planetCreationType = 1;
+        
+        // No resource by default
+        this.resourceCreationType = -1;
+        
         // Click event listener for godmod planet creation
         this.input.on('pointerdown', this.onClickCallback, this);
         
@@ -198,7 +242,6 @@ export class Space extends Phaser.Scene
 
         // Init planets
         this.loadMap();
-
         EventBus.emit('current-scene-ready', this);
     }
 
@@ -251,6 +294,44 @@ export class Space extends Phaser.Scene
         this.scene.start('Space');
     }
 
+    crashCallback() :boolean
+    {
+        
+        
+        let planetRadius = this.attractedTo?.attractionSprite.displayWidth;
+        let planetPos = new Vector2(
+            this.attractedTo?.attractionSprite.body?.position.x + (planetRadius / 2),
+            this.attractedTo?.attractionSprite.body?.position.y + (planetRadius / 2)
+        );
+        
+        let playerRadius = this.player.displayWidth;
+        let playerPos =  new Vector2(
+            this.player.body.position.x + playerRadius / 2,
+            this.player.body.position.y + playerRadius / 2
+        );
+        let playerRotationVec = new Vector2(
+            Math.cos(this.player.rotation),
+            Math.sin(this.player.rotation)
+        )
+        
+        let player2PlanetVec = planetPos.subtract(playerPos)
+        
+        // const graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x00ff00 }, fillStyle: { color: 0xff0000 }});
+        // const rect = new Phaser.Geom.Rectangle(playerPos.x, playerPos.y, player2PlanetVec.x, player2PlanetVec.y);
+        // graphics.strokeRectShape(rect);
+       
+        // console.log(playerRotationVec.normalize().dot(player2PlanetVec.normalize()))
+        // if(this.player.body.velocity.length() > 300) {
+        //     console.log("yo")
+        // }
+        if (playerRotationVec.normalize().dot(player2PlanetVec.normalize()) > -0.7) {
+            console.log("OUYAAA")
+            return true;
+        }
+        return true;
+        
+    }
+    
     collisionCallback()
     {
         console.log('Bomboclat');
