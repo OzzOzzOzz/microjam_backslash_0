@@ -4,6 +4,8 @@ import Vector2 = Phaser.Math.Vector2;
 import Background from "../objects/Background.ts";
 import {GameObjects} from "phaser";
 import StaticGroup = Phaser.Physics.Arcade.StaticGroup;
+import V = Phaser.Input.Keyboard.KeyCodes.V;
+import {copyFileSync} from "node:fs";
 
 type AttractedTo = { attractionSprite: GameObjects.Sprite, distance: number }; 
 
@@ -163,7 +165,7 @@ export class Space extends Phaser.Scene {
         attractionSprite.displayHeight = attractionCircleRadius;
 
         this.physics.add.overlap(this.player, attractionSprite, this.overlapCallback, undefined, this);
-        this.physics.add.collider(this.planets, this.player, this.collisionCallback, undefined, this);
+        this.physics.add.collider(this.planets, this.player, this.collisionCallback, this.crashCallback, this);
 
         this.planets.refresh();
 
@@ -288,6 +290,44 @@ export class Space extends Phaser.Scene {
         this.scene.start('Space');
     }
 
+    crashCallback() :boolean
+    {
+        
+        
+        let planetRadius = this.attractedTo?.attractionSprite.displayWidth;
+        let planetPos = new Vector2(
+            this.attractedTo?.attractionSprite.body?.position.x + (planetRadius / 2),
+            this.attractedTo?.attractionSprite.body?.position.y + (planetRadius / 2)
+        );
+        
+        let playerRadius = this.player.displayWidth;
+        let playerPos =  new Vector2(
+            this.player.body.position.x + playerRadius / 2,
+            this.player.body.position.y + playerRadius / 2
+        );
+        let playerRotationVec = new Vector2(
+            Math.cos(this.player.rotation),
+            Math.sin(this.player.rotation)
+        )
+        
+        let player2PlanetVec = planetPos.subtract(playerPos)
+        
+        // const graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x00ff00 }, fillStyle: { color: 0xff0000 }});
+        // const rect = new Phaser.Geom.Rectangle(playerPos.x, playerPos.y, player2PlanetVec.x, player2PlanetVec.y);
+        // graphics.strokeRectShape(rect);
+       
+        // console.log(playerRotationVec.normalize().dot(player2PlanetVec.normalize()))
+        if (playerRotationVec.normalize().dot(player2PlanetVec.normalize()) > -0.7) {
+            console.log("OUYAAA")
+            return false;
+        }
+        return true;
+        
+        if(this.player.body.velocity.length() > 300) {
+            console.log("yo")
+        }
+    }
+    
     collisionCallback()
     {
         console.log('Bomboclat');
