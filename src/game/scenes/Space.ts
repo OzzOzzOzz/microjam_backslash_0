@@ -55,7 +55,7 @@ export class Space extends Phaser.Scene
         attractionSprite.displayHeight =  attractionCircleRadius;
 
         this.physics.add.overlap(this.player, attractionSprite, this.overlapCallback, undefined, this);
-        this.physics.add.collider(this.planets, this.player, this.collisionCallback);
+        this.physics.add.collider(this.planets, this.player, this.collisionCallback, undefined, this);
         
         this.planets.refresh();
     }
@@ -72,6 +72,8 @@ export class Space extends Phaser.Scene
         this.physics.world.drawDebug = false;
         
         this.isGameOver = false;
+        // Init Music
+        this.sound.play('lewis-hamilton-project', { loop: true });
         
         // Init Background
         this.background = new Background(this);
@@ -88,8 +90,9 @@ export class Space extends Phaser.Scene
 
         // Init planets
         this.planets = this.physics.add.staticGroup();
-        this.spawnPlanet(1000, 1000, 200);
+        this.spawnPlanet(1000, 1000, 100);
         this.spawnPlanet(1600, 1000, 200);
+        this.spawnPlanet(1600, 1600, 300);
         
         EventBus.emit('current-scene-ready', this);
     }
@@ -126,13 +129,21 @@ export class Space extends Phaser.Scene
             this.updateGodModPhysics(time, delta)
         }
         this.playerPositionText.setText(
-            `Position: (${this.player.x.toFixed(2)}, ${this.player.y.toFixed(2)}) Speed: ${this.player.body?.velocity.length()}`
+            `Position: (${this.player.x.toFixed(0)}, ${this.player.y.toFixed(0)}) Speed: ${this.player.body.velocity.length().toFixed(0)}`
         );
+
     }
-    
+
+    private restart() {
+        console.log('Restart');
+        this.sound.stopAll();
+        this.scene.start('Space');
+    }
+
     collisionCallback()
     {
         console.log('Bomboclat');
+        this.player.oxygenTank.setOxygen(100);
     }
     
     updatePhysics(time: number, delta: number) {
@@ -176,7 +187,7 @@ export class Space extends Phaser.Scene
     
     updateGodModPhysics(time: number, delta: number) {
         this.player.setVelocity(0);
-        const speed: number = 50;
+        const speed: number = 30;
         if (this.cursors.up.isDown) {
             this.player.y -= speed;
         }
@@ -194,11 +205,11 @@ export class Space extends Phaser.Scene
     private accelerateToPlanet() {
         this.player.setAcceleration(0);
         if (this.attractedTo) {
-            this.physics.accelerateToObject(this.player, this.attractedTo.attractionSprite, (this.attractedTo.attractionSprite.displayWidth / this.attractedTo.distance) * 16);
+            this.physics.accelerateToObject(this.player, this.attractedTo.attractionSprite, (this.attractedTo.attractionSprite.displayWidth / this.attractedTo.distance) * 32);
         }
     }
 
     changeScene () {
-        this.scene.start('Space');
+        this.restart()
     }
 }
