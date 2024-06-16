@@ -7,6 +7,7 @@ import {Space} from "./game/scenes/Space.ts";
 //  References to the PhaserGame component (game and scene are exposed)
 const phaserRef = ref();
 const isGodMod = ref(false);
+const planetCreationType = ref(1);
 
 const resetScene = () => {
     const scene = toRaw(phaserRef.value.scene) as MainMenu;
@@ -33,8 +34,22 @@ const toggleGodMod = () => {
     const scene = toRaw(phaserRef.value.scene) as Space;
     (scene as Space).toggleGodMod();
 }
-// Event emitted from the PhaserGame component
 
+const downloadMap = () => {
+    const scene = toRaw(phaserRef.value.scene) as Space;
+    (scene as Space).downloadMap();
+}
+
+
+
+const changePlanetCreationType = () => {
+    planetCreationType.value += 1;
+    if (planetCreationType.value > 3) {
+        planetCreationType.value = 1;
+    }
+    const scene = toRaw(phaserRef.value.scene) as Space;
+    (scene as Space).changePlanetCreationType(planetCreationType.value);
+}
 
 </script>
 
@@ -52,6 +67,15 @@ const toggleGodMod = () => {
         </div>
         <div>
             <button class="button" @click="toggleGodMod">Toggle god mod</button>
+        </div>
+        <div v-if="isGodMod" class="subText">
+            <p>Planet type: {{planetCreationType}}</p>
+        </div>
+        <div>
+            <button v-if="isGodMod" class="button" @click="changePlanetCreationType">Change planet type</button>
+        </div>
+        <div>
+            <button v-if="isGodMod" class="button" @click="downloadMap">Download map</button>
         </div>
     </div>
 </template>

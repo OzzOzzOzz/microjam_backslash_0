@@ -10,6 +10,7 @@ type AttractedTo = { attractionSprite: GameObjects.Sprite, distance: number };
 export class Space extends Phaser.Scene
 {
     isGodMod: boolean;
+    planetCreationType: number;
     private player: Player;
     private background: Background;
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -31,6 +32,57 @@ export class Space extends Phaser.Scene
         }
     }
 
+    spawnSpecificPlanet(posX: number, posY: number, type: number) {
+        let radius: number = 125;
+        if (type === 1) {
+            radius = 125;
+        } else if (type === 2) {
+            radius = 200;
+        } else if (type === 3) {
+            radius = 300;
+        }
+        console.log(type);
+        console.log(radius);
+        this.spawnPlanet(posX, posY, radius);
+    }
+
+    changePlanetCreationType(newType: number) {
+        this.planetCreationType = newType;
+    }
+    
+    onClickCallback() {
+        if (!this.isGodMod) {
+            return;
+        }
+        const coordinates = {
+            x: this.input.activePointer.worldX,
+            y: this.input.activePointer.worldY,
+        };
+        this.spawnSpecificPlanet(coordinates.x, coordinates.y, this.planetCreationType);
+    }
+
+    downloadMap() {
+        const planetMap = this.planets.getChildren().map((planet)  => {
+            console.log(planet);
+            return {
+                position: {
+                    x: planet!.body!.position.x,
+                    y: planet!.body!.position.y
+                },
+                radius: planet!.body!.radius,
+            };
+        })
+        const map = {
+            planets: planetMap
+        };
+        const blob = new Blob([JSON.stringify(map, null, 2)], { type: 'application/json' })
+        const link = document.createElement('a')
+        link.href = URL.createObjectURL(blob)
+        link.download = "map";
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+    
     spawnPlanet(posX: number, posY: number, radius: number)
     {
         const spawnCoordinates: Vector2 = new Phaser.Math.Vector2(posX, posY);
@@ -40,6 +92,7 @@ export class Space extends Phaser.Scene
             spawnCoordinates.y,
             'planet' + Phaser.Math.Between(1, 4)
         );
+        planet.setOrigin(0.5);
         planet.setCircle(radius / 2);
         planet.displayWidth = radius;
         planet.displayHeight = radius;
@@ -66,10 +119,16 @@ export class Space extends Phaser.Scene
             distance: Phaser.Math.Distance.Between(player.x, player.y, planet.x, planet.y)
         };
     }
-
+    
     create()
     {
-        this.physics.world.drawDebug = false;
+        if (!this.isGodMod) {
+            this.physics.world.drawDebug = false;
+        }
+        // Default planet creation type (size)
+        this.planetCreationType = 1;
+        // Click event listener for godmod planet creation
+        this.input.on('pointerdown', this.onClickCallback, this);
         
         this.isGameOver = false;
         // Init Music
