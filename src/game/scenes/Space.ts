@@ -19,6 +19,7 @@ export class Space extends Phaser.Scene
     attractedTo: AttractedTo | null = null;
     private isGameOver: boolean;
     planets: StaticGroup;
+    private hudCamera: Phaser.Cameras.Scene2D.Camera;
     
     constructor() {
         super('Space');
@@ -108,6 +109,9 @@ export class Space extends Phaser.Scene
         this.physics.add.collider(this.planets, this.player, this.collisionCallback, undefined, this);
 
         this.planets.refresh();
+        
+        this.hudCamera.ignore(planet);
+        this.hudCamera.ignore(attractionSprite);
     }
 
     overlapCallback(player, planet) {
@@ -150,24 +154,28 @@ export class Space extends Phaser.Scene
         this.gameOverText = this.add.text(screenCenterX, screenCenterY, ['No oxygen left.','Press SPACE to retry'], { font: '48px dimitri', color: '#C70039', stroke: '#ffffff', strokeThickness: 2, align: 'justify' }).setOrigin(0).setScrollFactor(0).setVisible(false);
         this.playerPositionText = this.add.text(10, 10, '', { font: '16px dimitri', color: '#ffffff' }).setScrollFactor(0);
 
+        const hudElements: [GameObjects.GameObject] =
+            [
+                this.player.inventoryHUD, 
+                this.playerPositionText,
+            ];
+        this.hudCamera = this.cameras.add(0, 0, this.scale.width, this.scale.height);
+        this.hudCamera.setScroll(0, 0);
+        this.hudCamera.ignore(this.children.list.filter(child => 
+                !hudElements.includes(child)
+            )
+        );
+        this.cameras.main.ignore(this.children.list.filter(child =>
+                hudElements.includes(child)
+            )
+        );
+
         // Init planets
         this.planets = this.physics.add.staticGroup();
         this.spawnPlanet(1000, 1000, 100);
         this.spawnPlanet(1600, 1000, 200);
         this.spawnPlanet(1600, 1600, 300);
 
-        const hudElements: [GameObjects.GameObject] =
-            [
-                this.player.inventoryHUD, 
-                this.playerPositionText,
-            ];
-        let hudCamera = this.cameras.add(0, 0, this.scale.width, this.scale.height);
-        hudCamera.setScroll(0, 0);
-        hudCamera.ignore(this.children.list.filter(child => 
-                !hudElements.includes(child)
-            )
-        );
-        this.cameras.main.ignore(this.children.list.filter(child => hudElements.includes(child)));
 
         EventBus.emit('current-scene-ready', this);
     }
