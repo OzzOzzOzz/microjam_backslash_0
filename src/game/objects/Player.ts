@@ -4,7 +4,7 @@ import AnimationState = Phaser.Animations.AnimationState;
 import InventoryHUD from "./InventoryHUD.ts";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-    private inventoryHUD: InventoryHUD;
+    inventoryHUD: InventoryHUD;
     oxygenTank: OxygenTank;
     oxygenBreathConsumptionBySecond: number;
     oxygenBurstConsumptionBySecond: number;
@@ -46,7 +46,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             frameRate: 7,
             frames: this.anims.generateFrameNumbers("thrusters", {
                 start: 1,
-                end: 8,
+                end: 7,
             }),
             repeat: -1
         })
@@ -67,10 +67,5 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     update (time: number, delta: number)
     {
-        const delta_seconds: number = delta / 1000.0;
-        
-        // Oxygen is always consumed by breathing
-        this.oxygenTank.consumeOxygen(this.oxygenBreathConsumptionBySecond * delta_seconds);
-        this.oxygenTank.setPosition(this.x - 26, this.y - 30);
     }
 }

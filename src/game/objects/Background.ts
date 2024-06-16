@@ -2,36 +2,37 @@
 import Phaser, {GameObjects} from 'phaser';
 
 export default class Background {
-    private spaceBackgroundStars: {
+    spaceBackgroundStars: {
         "behind": GameObjects.TileSprite,
         "middle": GameObjects.TileSprite,
         "front": GameObjects.TileSprite,
     };
-    private scene: Phaser.Scene
+    scene: Phaser.Scene
 
     constructor(scene: Phaser.Scene)
     {
         this.scene = scene;
+        const tileScale = 10;
         this.spaceBackgroundStars = {
             "behind": this.scene.add.tileSprite(
-                0,
-                0,
-                this.scene.physics.world.bounds.width,
-                this.scene.physics.world.bounds.height,
+                -this.scene.physics.world.bounds.width * tileScale / 2,
+                -this.scene.physics.world.bounds.height * tileScale / 2,
+                this.scene.physics.world.bounds.width * tileScale,
+                this.scene.physics.world.bounds.height * tileScale,
                 'behindStars'
             ).setScrollFactor(0).setOrigin(0, 0).setTileScale(2, 2),
             "middle": this.scene.add.tileSprite(
-                0,
-                0,
-                this.scene.physics.world.bounds.width,
-                this.scene.physics.world.bounds.height,
+                -this.scene.physics.world.bounds.width * tileScale / 2,
+                -this.scene.physics.world.bounds.height * tileScale / 2,
+                this.scene.physics.world.bounds.width * tileScale,
+                this.scene.physics.world.bounds.height * tileScale,
                 'middleStars'
             ).setScrollFactor(0).setOrigin(0, 0).setTileScale(2, 2),
             "front": this.scene.add.tileSprite(
-                0,
-                0,
-                this.scene.physics.world.bounds.width,
-                this.scene.physics.world.bounds.height,
+                -this.scene.physics.world.bounds.width * tileScale / 2,
+                -this.scene.physics.world.bounds.height * tileScale / 2,
+                this.scene.physics.world.bounds.width * tileScale,
+                this.scene.physics.world.bounds.height * tileScale,
                 'frontStars'
             ).setScrollFactor(0).setOrigin(0, 0).setTileScale(2, 2),
         };
