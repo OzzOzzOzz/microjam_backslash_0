@@ -3,6 +3,7 @@ import Player from "../objects/Player";
 import Vector2 = Phaser.Math.Vector2;
 import Background from "../objects/Background.ts";
 import {GameObjects} from "phaser";
+import StaticGroup = Phaser.Physics.Arcade.StaticGroup;
 
 type AttractedTo = { attractionSprite: GameObjects.Sprite, distance: number }; 
 
@@ -15,7 +16,7 @@ export class Space extends Phaser.Scene
     private gameOverText: Phaser.GameObjects.Text;
     attractedTo: AttractedTo | null = null;
     private isGameOver: boolean;
-    planets: Phaser.Physics.Arcade.StaticGroup;
+    planets: StaticGroup;
     
     constructor() {
         super('Space');
@@ -95,7 +96,7 @@ export class Space extends Phaser.Scene
     update(time: number, delta: number)
     {
         this.checkOxygenLevels();
-        if (this.cursors.space.isDown) {
+        if (this.isGameOver && this.cursors.space.isDown) {
             this.scene.start('Space');
         }
         this.background.update(delta);
@@ -110,7 +111,7 @@ export class Space extends Phaser.Scene
             }
         }
         this.playerPositionText.setText(
-            `Position: (${this.player.x.toFixed(2)}, ${this.player.y.toFixed(2)})`
+            `Position: (${this.player.x.toFixed(2)}, ${this.player.y.toFixed(2)}) Speed: ${this.player.body?.velocity.length()}`
         );
     }
     
@@ -160,7 +161,7 @@ export class Space extends Phaser.Scene
     private accelerateToPlanet() {
         this.player.setAcceleration(0);
         if (this.attractedTo) {
-            this.physics.accelerateToObject(this.player, this.attractedTo.attractionSprite, (this.attractedTo.attractionSprite.displayWidth - this.attractedTo.distance) * 0.5);
+            this.physics.accelerateToObject(this.player, this.attractedTo.attractionSprite, (this.attractedTo.attractionSprite.displayWidth / this.attractedTo.distance) * 16);
         }
     }
 
