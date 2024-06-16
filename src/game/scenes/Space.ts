@@ -7,7 +7,9 @@ import StaticGroup = Phaser.Physics.Arcade.StaticGroup;
 
 type AttractedTo = { attractionSprite: GameObjects.Sprite, distance: number }; 
 
-export class Space extends Phaser.Scene {
+export class Space extends Phaser.Scene
+{
+    isGodMod: boolean;
     private player: Player;
     private background: Background;
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -16,10 +18,17 @@ export class Space extends Phaser.Scene {
     attractedTo: AttractedTo | null = null;
     private isGameOver: boolean;
     planets: StaticGroup;
-    private isUnzooming: boolean = false;
-
+    
     constructor() {
         super('Space');
+    }
+    
+    toggleGodMod() {
+        this.isGodMod = !this.isGodMod;
+        this.physics.world.drawDebug =  !this.physics.world.drawDebug;
+        if (!this.physics.world.drawDebug) {
+            this.physics.world.debugGraphic.clear()
+        }
     }
 
     spawnPlanet(posX: number, posY: number, radius: number) {
@@ -59,7 +68,11 @@ export class Space extends Phaser.Scene {
 
     create()
     {
+        this.physics.world.drawDebug = false;
+        
         this.isGameOver = false;
+        // Init Music
+        this.sound.play('lewis-hamilton-project', { loop: true });
         
         // Init Background
         this.background = new Background(this);
@@ -114,20 +127,24 @@ export class Space extends Phaser.Scene {
     
     update(time: number, delta: number)
     {
-        this.checkOxygenLevels();
-        if (this.isGameOver && this.cursors.space.isDown) {
-            this.scene.start('Space');
-        }
         this.background.update(delta);
         this.player.update(time, delta);
-        this.updatePhysics(time, delta);
-
-        if (this.isGameOver) {
-            if (time % 1000 < 500) {
-                this.gameOverText.setVisible(true);
-            } else {
-                this.gameOverText.setVisible(false);
+        this.player.oxygenTank.setPosition(this.player.x - 26, this.player.y - 30);
+        if (!this.isGodMod) {
+            this.updatePhysics(time, delta);
+            this.checkOxygenLevels();
+            if (this.isGameOver && this.cursors.space.isDown) {
+                this.scene.start('Space');
             }
+            if (this.isGameOver) {
+                if (time % 1000 < 500) {
+                    this.gameOverText.setVisible(true);
+                } else {
+                    this.gameOverText.setVisible(false);
+                }
+            }
+        } else {
+            this.updateGodModPhysics(time, delta)
         }
         
         // this.cameras.main.ignore(this.playerPositionText);
@@ -136,7 +153,13 @@ export class Space extends Phaser.Scene {
         );
 
     }
-    
+
+    private restart() {
+        console.log('Restart');
+        this.sound.stopAll();
+        this.scene.start('Space');
+    }
+
     collisionCallback()
     {
         console.log('Bomboclat');
@@ -146,6 +169,11 @@ export class Space extends Phaser.Scene {
     updatePhysics(time: number, delta: number) {
         const delta_seconds: number = delta / 1000.0;
 
+        if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+            this.sound.play('reactor', { volume: 0.5, loop: true });
+        }
+        // Oxygen is always consumed by breathing
+        this.player.oxygenTank.consumeOxygen(this.player.oxygenBreathConsumptionBySecond * delta_seconds);
         if (this.cursors.up.isDown) {
             if (!this.player.oxygenTank.isEmpty()) {
                 this.player.oxygenTank.consumeOxygen(this.player.oxygenBurstConsumptionBySecond * delta_seconds);
@@ -164,6 +192,7 @@ export class Space extends Phaser.Scene {
         }
 
         if (this.cursors.up.isUp) {
+            this.sound.stopByKey('reactor');
             if (this.player.thrusters.anims.isPlaying) {
                 this.player.thrusters.anims.stop();
                 this.player.thrusters.setVisible(false);
@@ -177,6 +206,23 @@ export class Space extends Phaser.Scene {
             this.player.setAngularVelocity(300);
         } else {
             this.player.setAngularVelocity(0);
+        }
+    }
+    
+    updateGodModPhysics(time: number, delta: number) {
+        this.player.setVelocity(0);
+        const speed: number = 30;
+        if (this.cursors.up.isDown) {
+            this.player.y -= speed;
+        }
+        if (this.cursors.down.isDown) {
+            this.player.y += speed;
+        }
+        if (this.cursors.left.isDown) {
+            this.player.x -= speed;
+        }
+        if (this.cursors.right.isDown) {
+            this.player.x += speed;
         }
     }
 
@@ -214,6 +260,6 @@ export class Space extends Phaser.Scene {
     }
 
     changeScene () {
-        this.scene.start('Space');
+        this.restart()
     }
 }
